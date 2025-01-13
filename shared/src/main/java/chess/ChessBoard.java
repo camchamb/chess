@@ -53,19 +53,19 @@ public class ChessBoard {
         for (ChessGame.TeamColor color : ChessGame.TeamColor.values()) {
             var rookPiece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
             var knightPiece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-            var BishopPiece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+            var bishopPiece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
             var kingPiece = new ChessPiece(color, ChessPiece.PieceType.KING);
             var queenPiece = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
             var rook2Piece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-            var kight2Piece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            var knight2Piece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
             var bishop2Piece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
             addPiece(new ChessPosition(y, 1), rookPiece);
             addPiece(new ChessPosition(y, 2), knightPiece);
-            addPiece(new ChessPosition(y, 3), BishopPiece);
+            addPiece(new ChessPosition(y, 3), bishopPiece);
             addPiece(new ChessPosition(y, 5), kingPiece);
             addPiece(new ChessPosition(y, 4), queenPiece);
             addPiece(new ChessPosition(y, 8), rook2Piece);
-            addPiece(new ChessPosition(y, 7), kight2Piece);
+            addPiece(new ChessPosition(y, 7), knight2Piece);
             addPiece(new ChessPosition(y, 6), bishop2Piece);
             y += 7;
         }
