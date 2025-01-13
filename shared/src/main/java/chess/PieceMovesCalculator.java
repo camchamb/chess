@@ -36,6 +36,9 @@ public class PieceMovesCalculator {
             moves = (ArrayList<ChessMove>) rookMove(moves);
             moves = (ArrayList<ChessMove>) bishopMove(moves);
         }
+        if (this.type.equals(ChessPiece.PieceType.KNIGHT)) {
+            moves = (ArrayList<ChessMove>) knightMove(moves);
+        }
         return moves;
     }
 
@@ -114,6 +117,20 @@ public class PieceMovesCalculator {
         for (int i = 1; i <= 8; i++) {
             if (!addSpace(moves, myPosition.getRow()-i, myPosition.getColumn()+i)) {
                 break;
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> knightMove(Collection<ChessMove> moves) {
+        for (int y = -2; y <= 2; y+=4) {
+            for (int x = -1; x <= 1; x+=2) {
+                addSpace(moves, y+myPosition.getRow(), x+myPosition.getColumn());
+            }
+        }
+        for (int x = -2; x <= 2; x+=4) {
+            for (int y = -1; y <= 1; y+=2) {
+                addSpace(moves, y+myPosition.getRow(), x+myPosition.getColumn());
             }
         }
         return moves;
