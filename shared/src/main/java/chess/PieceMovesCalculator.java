@@ -29,8 +29,8 @@ public class PieceMovesCalculator {
         if (this.type.equals(ChessPiece.PieceType.KING)) {
             moves = (ArrayList<ChessMove>) kingMove(moves);
         }
-        if (this.type.equals(ChessPiece.PieceType.KING)) {
-//            moves = kingMove();
+        if (this.type.equals(ChessPiece.PieceType.BISHOP)) {
+            moves = (ArrayList<ChessMove>) bishopMove(moves);
         }
         return moves;
     }
@@ -86,6 +86,30 @@ public class PieceMovesCalculator {
             for (int x = myPosition.getColumn() - 1; x <= myPosition.getColumn() + 1; x++) {
                 if (!addSpace(moves, y, x)) {
                 }
+            }
+        }
+        return moves;
+    }
+
+    private Collection<ChessMove> bishopMove(Collection<ChessMove> moves) {
+        for (int i = 1; i <= 8; i++) {
+            if (!addSpace(moves, myPosition.getRow()+i, myPosition.getColumn()-i)) {
+                break;
+            }
+        }
+        for (int i = 1; i <= 8; i++) {
+            if (!addSpace(moves, myPosition.getRow()+i, myPosition.getColumn()+i)) {
+                break;
+            }
+        }
+        for (int i = 1; i <= 8; i++) {
+            if (!addSpace(moves, myPosition.getRow()-i, myPosition.getColumn()-i)) {
+                break;
+            }
+        }
+        for (int i = 1; i <= 8; i++) {
+            if (!addSpace(moves, myPosition.getRow()-i, myPosition.getColumn()+i)) {
+                break;
             }
         }
         return moves;
