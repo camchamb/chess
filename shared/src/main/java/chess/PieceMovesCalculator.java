@@ -17,6 +17,7 @@ public class PieceMovesCalculator {
         this.board = board;
         this.myPosition = myPosition;
     }
+
     public Collection<ChessMove> pieceMoves() {
         ArrayList<ChessMove> moves = new ArrayList<>();
         if (this.type.equals(ChessPiece.PieceType.ROOK)) {
@@ -37,13 +38,13 @@ public class PieceMovesCalculator {
     private boolean addSpace(Collection<ChessMove> moves, int y, int x) {
         var position = new ChessPosition(y, x);
         if (board.getPiece(position) == null) {
-            moves.add(new ChessMove(this.myPosition, position, this.type));
+            moves.add(new ChessMove(this.myPosition, position, null));
             return true;
         } else {
             if (board.getPiece(position).getTeamColor().equals(pieceColor)) {
                 return false;
             } else {
-                moves.add(new ChessMove(this.myPosition, position, this.type));
+                moves.add(new ChessMove(this.myPosition, position, null));
                 return false;
             }
         }
