@@ -32,6 +32,10 @@ public class PieceMovesCalculator {
         if (this.type.equals(ChessPiece.PieceType.BISHOP)) {
             moves = (ArrayList<ChessMove>) bishopMove(moves);
         }
+        if (this.type.equals(ChessPiece.PieceType.QUEEN)) {
+            moves = (ArrayList<ChessMove>) rookMove(moves);
+            moves = (ArrayList<ChessMove>) bishopMove(moves);
+        }
         return moves;
     }
 
