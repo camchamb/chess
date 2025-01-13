@@ -80,7 +80,9 @@ public class PieceMovesCalculator {
     }
 
     private void promotePawn(Collection<ChessMove> moves, ChessPosition position) {
-        if ((pieceColor.equals(ChessGame.TeamColor.WHITE) && myPosition.getRow() == 7) || (pieceColor.equals(ChessGame.TeamColor.BLACK) && myPosition.getRow() == 2)) {
+        if ((pieceColor.equals(ChessGame.TeamColor.WHITE)
+                && myPosition.getRow() == 7) || (pieceColor.equals(ChessGame.TeamColor.BLACK)
+                && myPosition.getRow() == 2)) {
             for (var piece : ChessPiece.PieceType.values()) {
                 if (piece != ChessPiece.PieceType.KING && piece != ChessPiece.PieceType.PAWN) {
                     moves.add(new ChessMove(this.myPosition, position, piece));

@@ -51,22 +51,22 @@ public class ChessBoard {
         }
         int y = 1;
         for (ChessGame.TeamColor color : ChessGame.TeamColor.values()) {
-            var RookPiece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-            var KnightPiece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            var rookPiece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+            var knightPiece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
             var BishopPiece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-            var KingPiece = new ChessPiece(color, ChessPiece.PieceType.KING);
-            var QueenPiece = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
-            var Rook2Piece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-            var Knight2Piece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-            var Bishop2Piece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-            addPiece(new ChessPosition(y, 1), RookPiece);
-            addPiece(new ChessPosition(y, 2), KnightPiece);
+            var kingPiece = new ChessPiece(color, ChessPiece.PieceType.KING);
+            var queenPiece = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
+            var rook2Piece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
+            var kight2Piece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
+            var bishop2Piece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
+            addPiece(new ChessPosition(y, 1), rookPiece);
+            addPiece(new ChessPosition(y, 2), knightPiece);
             addPiece(new ChessPosition(y, 3), BishopPiece);
-            addPiece(new ChessPosition(y, 5), KingPiece);
-            addPiece(new ChessPosition(y, 4), QueenPiece);
-            addPiece(new ChessPosition(y, 8), Rook2Piece);
-            addPiece(new ChessPosition(y, 7), Knight2Piece);
-            addPiece(new ChessPosition(y, 6), Bishop2Piece);
+            addPiece(new ChessPosition(y, 5), kingPiece);
+            addPiece(new ChessPosition(y, 4), queenPiece);
+            addPiece(new ChessPosition(y, 8), rook2Piece);
+            addPiece(new ChessPosition(y, 7), kight2Piece);
+            addPiece(new ChessPosition(y, 6), bishop2Piece);
             y += 7;
         }
     }
