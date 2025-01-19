@@ -14,17 +14,22 @@ public class ChessMove {
     private final ChessPosition endPosition;
     private final ChessPiece.PieceType promotionPiece;
 
+    @Override
+    public String toString() {
+        return "{" +
+                "start=" + startPosition +
+                ", end=" + endPosition +
+                ", promotion=" + promotionPiece +
+                '}';
+    }
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         this.promotionPiece = promotionPiece;
     }
-    @Override
-    public String toString() {
-//        return promotionPiece
-        return "{" + endPosition.getColumn() + ", " + endPosition.getRow() + '}';
-    }
+
     /**
      * @return ChessPosition of starting location
      */

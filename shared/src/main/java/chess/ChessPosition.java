@@ -20,7 +20,7 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "{" + col + ", " + row + '}';
+        return "{" + row + ", " + col + '}';
     }
     /**
      * @return which row this position is in
