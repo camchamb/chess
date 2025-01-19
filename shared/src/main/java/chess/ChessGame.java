@@ -64,17 +64,21 @@ public class ChessGame {
         var moves = validMoves(move.getStartPosition());
         System.out.println(moves);
         if (moves == null) throw new InvalidMoveException("Not a piece there");
-
         if (board.getPiece(move.getStartPosition()).getTeamColor() != currentPlayer) {
             throw new InvalidMoveException("Wrong Team");
         }
-
         if (!moves.contains(move)) {
             throw new InvalidMoveException("Not a valid move");
         }
+        if (move.getPromotionPiece() != null) {
+            ChessPiece piece = new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece());
+            board.addPiece(move.getEndPosition(), piece);
+            board.addPiece(move.getStartPosition(), null);
+        } else {
         ChessPiece piece = board.getPiece(move.getStartPosition());
         board.addPiece(move.getEndPosition(), piece);
         board.addPiece(move.getStartPosition(), null);
+        }
         if (currentPlayer.equals(TeamColor.WHITE)) {
             setTeamTurn(TeamColor.BLACK);
         } else {
