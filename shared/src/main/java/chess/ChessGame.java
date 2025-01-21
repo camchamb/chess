@@ -14,6 +14,7 @@ public class ChessGame {
     private ChessBoard board = new ChessBoard();
 
     public ChessGame() {
+        board.resetBoard();
     }
 
     /**
@@ -94,8 +95,27 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
-    }
+        ChessPosition kingPosition;
+        if (teamColor.equals(TeamColor.WHITE)) {
+            kingPosition = board.getWhiteKing();
+        } else {
+            kingPosition = board.getBlackKing();
+        }
+        for (int x = 1; x < 9; x++) {
+            for (int y = 1; y < 9; y++) {
+                var position = new ChessPosition(y, x);
+                if (board.getPiece(position) != null) {
+                    var piece = board.getPiece(position);
+                    var moves = piece.pieceMoves(board, position);
+                        if (piece.getTeamColor() != teamColor
+                                && moves.contains(new ChessMove(position, kingPosition, null))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        return false;
+        }
 
     /**
      * Determines if the given team is in checkmate
@@ -124,6 +144,20 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+        this.board = null;
+        for (int x = 1; x < 9; x++) {
+            for (int y = 1; y < 9; y++) {
+                var position = new ChessPosition(y, x);
+                var piece = board.getPiece(position);
+                if (piece != null && piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+                    if (piece.getTeamColor().equals(TeamColor.WHITE)) {
+                        board.setWhiteKing(position);
+                    } else {
+                        board.setBlackKing(position);
+                    }
+                }
+            }
+        }
         this.board = board;
     }
 

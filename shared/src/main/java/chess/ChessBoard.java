@@ -12,6 +12,25 @@ import java.util.Objects;
 public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
+    private ChessPosition whiteKing = null;
+    private ChessPosition blackKing = null;
+
+    public ChessPosition getWhiteKing() {
+        return whiteKing;
+    }
+
+    public void setWhiteKing(ChessPosition whiteKing) {
+        this.whiteKing = whiteKing;
+    }
+
+    public ChessPosition getBlackKing() {
+        return blackKing;
+    }
+
+    public void setBlackKing(ChessPosition blackKing) {
+        this.blackKing = blackKing;
+    }
+
     public ChessBoard() {
     }
 
@@ -36,12 +55,21 @@ public class ChessBoard {
         return board[position.getRow()-1][position.getColumn()-1];
     }
 
+
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
         board = new ChessPiece[8][8];
+        whiteKing = new ChessPosition(1, 5);
+        blackKing = new ChessPosition(8, 5);
+
         for (int x = 1; x < 9; x++) {
             var whitePiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
             var blackPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
