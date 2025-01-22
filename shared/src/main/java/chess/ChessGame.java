@@ -54,12 +54,6 @@ public class ChessGame {
         if (this.board.getPiece(startPosition) == null) {return null;}
         var piece = this.board.getPiece(startPosition);
         var moves = piece.pieceMoves(this.board, startPosition);
-//        ChessPiece[][] gameState = Arrays.copyOf(board.getBoard(), board.getBoard().length);
-
-//        ChessPiece[][] gameState = new ChessPiece[8][8];
-//        for (int i = 0; i < 8; i++) {
-//            gameState[i] = Arrays.copyOf(board.getBoard()[i], 8);
-//        }
         ArrayList<ChessMove> newMoves = new ArrayList<>();
         for (var move : moves) {
             ChessPiece[][] gameState = new ChessPiece[8][8];
@@ -84,7 +78,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         var moves = validMoves(move.getStartPosition());
-        if (moves == null || moves.isEmpty()) throw new InvalidMoveException("Not a piece there");
+        if (moves == null || moves.isEmpty()) {throw new InvalidMoveException("Not a piece there");}
         if (board.getPiece(move.getStartPosition()).getTeamColor() != currentPlayer) {
             throw new InvalidMoveException("Wrong Team");
         }
@@ -185,7 +179,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if (!isInCheck(teamColor)) return false;
+        if (!isInCheck(teamColor)) {return false;}
         return !anyMoves(board, teamColor);
     }
 
@@ -197,7 +191,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        if (isInCheck(teamColor)) return false;
+        if (isInCheck(teamColor)) {return false;}
         return !anyMoves(board, teamColor);
     }
 
