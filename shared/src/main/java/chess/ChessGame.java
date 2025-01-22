@@ -1,7 +1,6 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -149,7 +148,7 @@ public class ChessGame {
 
 
 
-    public boolean anyMoves(ChessBoard board, TeamColor teamColor) {
+    private boolean noMoves(ChessBoard board, TeamColor teamColor) {
         for (int x = 1; x < 9; x++) {
             for (int y = 1; y < 9; y++) {
                 var position = new ChessPosition(y, x);
@@ -157,12 +156,12 @@ public class ChessGame {
                 if (piece != null && piece.getTeamColor() == teamColor) {
                     var moves = validMoves(position);
                     if (!moves.isEmpty()) {
-                        return true;
+                        return false;
                     }
                 }
             }
         }
-        return false;
+        return true;
         }
 
 
@@ -175,7 +174,7 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) {return false;}
-        return !anyMoves(board, teamColor);
+        return noMoves(board, teamColor);
     }
 
     /**
@@ -187,7 +186,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)) {return false;}
-        return !anyMoves(board, teamColor);
+        return noMoves(board, teamColor);
     }
 
     /**
@@ -212,12 +211,6 @@ public class ChessGame {
         }
     }
 
-
-    public void setBoard(ChessBoard board) {
-        this.board = null;
-        setKings(board);
-        this.board = board;
-    }
 
     /**
      * Gets the current chessboard
