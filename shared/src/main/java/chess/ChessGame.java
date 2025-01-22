@@ -135,7 +135,11 @@ public class ChessGame {
                     var piece = board.getPiece(position);
                     var moves = piece.pieceMoves(board, position);
                     if (piece.getTeamColor() != teamColor
-                            && moves.contains(new ChessMove(position, kingPosition, null))) {
+                            && (moves.contains(new ChessMove(position, kingPosition, null))
+                            || moves.contains(new ChessMove(position, kingPosition, ChessPiece.PieceType.QUEEN))
+                            || moves.contains(new ChessMove(position, kingPosition, ChessPiece.PieceType.ROOK))
+                            || moves.contains(new ChessMove(position, kingPosition, ChessPiece.PieceType.BISHOP))
+                            || moves.contains(new ChessMove(position, kingPosition, ChessPiece.PieceType.KNIGHT)))) {
                         return true;
                     }
                 }
@@ -154,6 +158,26 @@ public class ChessGame {
         return inCheckHelper(this.board, teamColor);
         }
 
+
+
+    public boolean anyMoves(ChessBoard board, TeamColor teamColor) {
+        for (int x = 1; x < 9; x++) {
+            for (int y = 1; y < 9; y++) {
+                var position = new ChessPosition(y, x);
+                var piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() == teamColor) {
+                    var moves = validMoves(position);
+                    if (!moves.isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+        }
+
+
+
     /**
      * Determines if the given team is in checkmate
      *
@@ -161,7 +185,8 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (!isInCheck(teamColor)) return false;
+        return !anyMoves(board, teamColor);
     }
 
     /**
@@ -173,7 +198,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)) return false;
-        throw new RuntimeException("Not implemented");
+        return !anyMoves(board, teamColor);
     }
 
     /**
