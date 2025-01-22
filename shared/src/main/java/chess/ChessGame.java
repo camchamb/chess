@@ -56,12 +56,7 @@ public class ChessGame {
         var moves = piece.pieceMoves(this.board, startPosition);
         ArrayList<ChessMove> newMoves = new ArrayList<>();
         for (var move : moves) {
-            ChessPiece[][] gameState = new ChessPiece[8][8];
-            for (int i = 0; i < 8; i++) {
-                gameState[i] = Arrays.copyOf(board.getBoard()[i], 8);
-            }
-            ChessBoard newBoard = new ChessBoard();
-            newBoard.setBoard(Arrays.copyOf(gameState, gameState.length));
+            var newBoard = board.clone();
             movePiece(newBoard, move);
             if (!inCheckHelper(newBoard, piece.getTeamColor())) {
                 newMoves.add(move);
