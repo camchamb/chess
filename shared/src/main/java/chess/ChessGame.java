@@ -194,8 +194,14 @@ public class ChessGame {
      *
      * @param board the new board to use
      */
+    public void setBoard(ChessBoard board) {
+        this.board = null;
+        setKings(board);
+        this.board = board;
+    }
 
-    public void setKings(ChessBoard board) {
+
+    private void setKings(ChessBoard board) {
         for (int x = 1; x < 9; x++) {
             for (int y = 1; y < 9; y++) {
                 var position = new ChessPosition(y, x);
@@ -210,6 +216,8 @@ public class ChessGame {
             }
         }
     }
+
+
 
 
     /**
