@@ -217,9 +217,6 @@ public class ChessGame {
         }
     }
 
-
-
-
     /**
      * Gets the current chessboard
      *
@@ -228,4 +225,12 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    private boolean didPawnJump (ChessMove move) {
+        return Math.abs(move.getEndPosition().getRow() - move.getStartPosition().getRow()) == 4;
+    }
+
+
+
+
 }
