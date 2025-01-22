@@ -31,6 +31,11 @@ public class ChessBoard {
         this.blackKing = blackKing;
     }
 
+    public void setBoard(ChessPiece[][] board) {
+        this.board = board.clone();
+    }
+
+
     public ChessBoard() {
     }
 

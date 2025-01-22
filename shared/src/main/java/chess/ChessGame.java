@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -49,8 +51,29 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        if (board.getPiece(startPosition) == null) {return null;}
-        return board.getPiece(startPosition).pieceMoves(board, startPosition);
+        if (this.board.getPiece(startPosition) == null) {return null;}
+        var piece = this.board.getPiece(startPosition);
+        var moves = piece.pieceMoves(this.board, startPosition);
+//        ChessPiece[][] gameState = Arrays.copyOf(board.getBoard(), board.getBoard().length);
+
+//        ChessPiece[][] gameState = new ChessPiece[8][8];
+//        for (int i = 0; i < 8; i++) {
+//            gameState[i] = Arrays.copyOf(board.getBoard()[i], 8);
+//        }
+        ArrayList<ChessMove> newMoves = new ArrayList<>();
+        for (var move : moves) {
+            ChessPiece[][] gameState = new ChessPiece[8][8];
+            for (int i = 0; i < 8; i++) {
+                gameState[i] = Arrays.copyOf(board.getBoard()[i], 8);
+            }
+            ChessBoard newBoard = new ChessBoard();
+            newBoard.setBoard(Arrays.copyOf(gameState, gameState.length));
+            movePiece(newBoard, move);
+            if (!inCheckHelper(newBoard, piece.getTeamColor())) {
+                newMoves.add(move);
+            }
+        }
+    return newMoves;
     }
 
     /**
@@ -60,26 +83,15 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        System.out.println(board);
-        System.out.println(move);
         var moves = validMoves(move.getStartPosition());
-        System.out.println(moves);
-        if (moves == null) throw new InvalidMoveException("Not a piece there");
+        if (moves == null || moves.isEmpty()) throw new InvalidMoveException("Not a piece there");
         if (board.getPiece(move.getStartPosition()).getTeamColor() != currentPlayer) {
             throw new InvalidMoveException("Wrong Team");
         }
         if (!moves.contains(move)) {
             throw new InvalidMoveException("Not a valid move");
         }
-        if (move.getPromotionPiece() != null) {
-            ChessPiece piece = new ChessPiece(board.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece());
-            board.addPiece(move.getEndPosition(), piece);
-            board.addPiece(move.getStartPosition(), null);
-        } else {
-        ChessPiece piece = board.getPiece(move.getStartPosition());
-        board.addPiece(move.getEndPosition(), piece);
-        board.addPiece(move.getStartPosition(), null);
-        }
+        movePiece(this.board, move);
         if (currentPlayer.equals(TeamColor.WHITE)) {
             setTeamTurn(TeamColor.BLACK);
         } else {
@@ -88,13 +100,28 @@ public class ChessGame {
     }
 
 
-    /**
-     * Determines if the given team is in check
-     *
-     * @param teamColor which team to check for check
-     * @return True if the specified team is in check
-     */
-    public boolean isInCheck(TeamColor teamColor) {
+    private void movePiece(ChessBoard gameState, ChessMove move) {
+        if (move.getPromotionPiece() != null) {
+            ChessPiece piece = new ChessPiece(gameState.getPiece(move.getStartPosition()).getTeamColor(), move.getPromotionPiece());
+            gameState.addPiece(move.getEndPosition(), piece);
+            gameState.addPiece(move.getStartPosition(), null);
+        } else {
+            ChessPiece piece = gameState.getPiece(move.getStartPosition());
+            if (piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+                if (piece.getTeamColor().equals(TeamColor.WHITE)) {
+                    gameState.setWhiteKing(move.getEndPosition());
+                } else {
+                    gameState.setBlackKing(move.getEndPosition());
+                }
+            }
+            gameState.addPiece(move.getEndPosition(), piece);
+            gameState.addPiece(move.getStartPosition(), null);
+        }
+    }
+
+
+    private boolean inCheckHelper(ChessBoard board, TeamColor teamColor) {
+        setKings(board);
         ChessPosition kingPosition;
         if (teamColor.equals(TeamColor.WHITE)) {
             kingPosition = board.getWhiteKing();
@@ -107,14 +134,24 @@ public class ChessGame {
                 if (board.getPiece(position) != null) {
                     var piece = board.getPiece(position);
                     var moves = piece.pieceMoves(board, position);
-                        if (piece.getTeamColor() != teamColor
-                                && moves.contains(new ChessMove(position, kingPosition, null))) {
-                            return true;
-                        }
+                    if (piece.getTeamColor() != teamColor
+                            && moves.contains(new ChessMove(position, kingPosition, null))) {
+                        return true;
                     }
                 }
             }
+        }
         return false;
+    }
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to check for check
+     * @return True if the specified team is in check
+     */
+    public boolean isInCheck(TeamColor teamColor) {
+        return inCheckHelper(this.board, teamColor);
         }
 
     /**
@@ -135,6 +172,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (isInCheck(teamColor)) return false;
         throw new RuntimeException("Not implemented");
     }
 
@@ -143,8 +181,8 @@ public class ChessGame {
      *
      * @param board the new board to use
      */
-    public void setBoard(ChessBoard board) {
-        this.board = null;
+
+    public void setKings(ChessBoard board) {
         for (int x = 1; x < 9; x++) {
             for (int y = 1; y < 9; y++) {
                 var position = new ChessPosition(y, x);
@@ -158,6 +196,12 @@ public class ChessGame {
                 }
             }
         }
+    }
+
+
+    public void setBoard(ChessBoard board) {
+        this.board = null;
+        setKings(board);
         this.board = board;
     }
 
