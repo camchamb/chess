@@ -14,6 +14,10 @@ public class ChessGame {
     private TeamColor currentPlayer = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
     private ChessPosition enPassantPosition = null;
+    private boolean whiteCanCastleRight = true;
+    private boolean blackCanCastleRight = true;
+    private boolean whiteCanCastleLeft = true;
+    private boolean blackCanCastleLeft = true;
 
     public ChessGame() {
         board.resetBoard();
@@ -96,6 +100,7 @@ public class ChessGame {
                 enPassantPosition = null;}
         } else {
             enPassantPosition = null;}
+        updateCastle(piece, move.getStartPosition());
     }
 
 
@@ -280,4 +285,35 @@ public class ChessGame {
         }
         return new ChessMove(startPosition, endPosition, null);
     }
+
+
+    private void updateCastle(ChessPiece piece, ChessPosition startPosition) {
+        if (piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+            if (piece.getTeamColor().equals(TeamColor.WHITE)) {
+                whiteCanCastleRight = false;
+                whiteCanCastleLeft = false;
+            } else {
+                blackCanCastleRight = false;
+                blackCanCastleLeft = false;
+            }
+        } else if (piece.getPieceType().equals(ChessPiece.PieceType.ROOK)) {
+            if (piece.getTeamColor().equals(TeamColor.WHITE)) {
+                if (startPosition.equals(new ChessPosition(1, 1))) {
+                    whiteCanCastleLeft = false;
+                }
+                if (startPosition.equals(new ChessPosition(1, 8))) {
+                    whiteCanCastleRight = false;
+                } else {
+                    if (startPosition.equals(new ChessPosition(8, 1))) {
+                        blackCanCastleLeft = false;
+                    }
+                    if (startPosition.equals(new ChessPosition(8, 8))) {
+                        whiteCanCastleRight = false;
+                    }
+                }
+
+            }
+        }
+    }
+
 }
