@@ -13,6 +13,7 @@ public class ChessGame {
 
     private TeamColor currentPlayer = TeamColor.WHITE;
     private ChessBoard board = new ChessBoard();
+    private ChessPosition enPassantPostition = null;
 
     public ChessGame() {
         board.resetBoard();
@@ -104,6 +105,11 @@ public class ChessGame {
             }
             gameState.addPiece(move.getEndPosition(), piece);
             gameState.addPiece(move.getStartPosition(), null);
+            if (piece.getPieceType().equals(ChessPiece.PieceType.PAWN)) {
+                if (didPawnJump(move)) {
+                    enPassantPostition = new ChessPosition(move.getEndPosition().getRow(), move.getEndPosition().getColumn());
+                } else {enPassantPostition = null;}
+            } else {enPassantPostition = null;}
         }
     }
 
@@ -231,6 +237,32 @@ public class ChessGame {
     }
 
 
+    private ChessMove enPassantMove(ChessPosition startPosition) {
+        if (enPassantPostition == null) {return null;}
+        var piece = board.getPiece(startPosition);
+        var pieceColor = piece.getTeamColor();
+        if (piece.getPieceType() != ChessPiece.PieceType.PAWN) {return null;}
+        ChessPosition endPosition;
+        if (pieceColor.equals(TeamColor.WHITE)) {
+            if (enPassantPostition.equals(new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 1))) {
+                endPosition = new ChessPosition(startPosition.getRow()+1, startPosition.getColumn() + 1);
+            }
+            if (enPassantPostition.equals(new ChessPosition(startPosition.getRow(), startPosition.getColumn() - 1))) {
+                endPosition = new ChessPosition(startPosition.getRow()+1, startPosition.getColumn() - 1);
+            }
+
+        } else {
+            if (enPassantPostition.equals(new ChessPosition(startPosition.getRow(), startPosition.getColumn() + 1))) {
+                endPosition = new ChessPosition(startPosition.getRow()-1, startPosition.getColumn() + 1);
+            }
+            if (enPassantPostition.equals(new ChessPosition(startPosition.getRow(), startPosition.getColumn() - 1))) {
+                endPosition = new ChessPosition(startPosition.getRow()-1, startPosition.getColumn() - 1);
+            }
+        }
 
 
+
+
+    return new ChessMove(startPosition,
+}
 }

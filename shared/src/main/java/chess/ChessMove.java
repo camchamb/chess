@@ -8,7 +8,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessMove {
+public class ChessMove implements Cloneable {
 
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
@@ -68,5 +68,16 @@ public class ChessMove {
     @Override
     public int hashCode() {
         return Objects.hash(startPosition, endPosition, promotionPiece);
+    }
+
+    @Override
+    public ChessMove clone() {
+        try {
+            ChessMove clone = (ChessMove) super.clone();
+            // TODO: copy mutable state here, so the clone can't change the internals of the original
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
