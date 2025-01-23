@@ -109,6 +109,31 @@ public class ChessGame {
         } else {
             enPassantPosition = null;
         }
+        if (piece.getPieceType().equals(ChessPiece.PieceType.KING)) {
+            if (Math.abs(move.getEndPosition().getColumn() - move.getStartPosition().getColumn()) == 2) {
+                if (move.getEndPosition().equals(new ChessPosition(1, 3))) {
+                    var rookPiece = board.getPiece(new ChessPosition(1, 1));
+                    board.addPiece(new ChessPosition(1, 1), null);
+                    board.addPiece(new ChessPosition(1, 4), rookPiece);
+                }
+                if (move.getEndPosition().equals(new ChessPosition(1, 7))) {
+                    var rookPiece = board.getPiece(new ChessPosition(1, 8));
+                    board.addPiece(new ChessPosition(1, 8), null);
+                    board.addPiece(new ChessPosition(1, 6), rookPiece);
+                }
+                if (move.getEndPosition().equals(new ChessPosition(8, 3))) {
+                    var rookPiece = board.getPiece(new ChessPosition(8, 1));
+                    board.addPiece(new ChessPosition(8, 1), null);
+                    board.addPiece(new ChessPosition(8, 4), rookPiece);
+                }
+                if (move.getEndPosition().equals(new ChessPosition(8, 7))) {
+                    var rookPiece = board.getPiece(new ChessPosition(8, 8));
+                    board.addPiece(new ChessPosition(8, 8), null);
+                    board.addPiece(new ChessPosition(8, 6), rookPiece);
+                }
+            }
+        }
+
         updateCastle(piece, move.getStartPosition());
     }
 
@@ -232,6 +257,10 @@ public class ChessGame {
         this.board = null;
         setKings(board);
         this.board = board;
+        whiteCanCastleRight = true;
+        blackCanCastleRight = true;
+        whiteCanCastleLeft = true;
+        blackCanCastleLeft = true;
     }
 
 
