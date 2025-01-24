@@ -61,7 +61,6 @@ public class ChessBoard implements Cloneable {
     }
 
 
-
     public ChessPiece[][] getBoard() {
         return board;
     }
