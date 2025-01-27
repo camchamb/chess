@@ -39,6 +39,45 @@ public class ChessBoard implements Cloneable {
     public ChessBoard() {
     }
 
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+        for (var item : board) {
+            builder.append(Arrays.toString(item));
+            builder.append(", ");
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(board);
+    }
+
+    @Override
+    public ChessBoard clone() {
+        try {
+            ChessBoard clone = (ChessBoard) super.clone();
+            ChessPiece[][] gameState = new ChessPiece[8][8];
+            for (int i = 0; i < 8; i++) {
+                gameState[i] = Arrays.copyOf(clone.getBoard()[i], 8);
+            }
+            clone.board = gameState;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -102,42 +141,5 @@ public class ChessBoard implements Cloneable {
         }
     }
 
-    @Override
-    public String toString() {
-        var builder = new StringBuilder();
-        for (var item : board) {
-            builder.append(Arrays.toString(item));
-            builder.append(", ");
-        }
-        return builder.toString();
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(board);
-    }
-
-    @Override
-    public ChessBoard clone() {
-        try {
-            ChessBoard clone = (ChessBoard) super.clone();
-            ChessPiece[][] gameState = new ChessPiece[8][8];
-            for (int i = 0; i < 8; i++) {
-                gameState[i] = Arrays.copyOf(clone.getBoard()[i], 8);
-            }
-            clone.board = gameState;
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
 }

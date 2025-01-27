@@ -13,15 +13,31 @@ public class ChessPosition {
     private final int row;
     private final int col;
 
+    @Override
+    public String toString() {
+        return "{" + row + ", " + col + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPosition that = (ChessPosition) o;
+        return row == that.row && col == that.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
+    }
+
     public ChessPosition(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    @Override
-    public String toString() {
-        return "{" + row + ", " + col + '}';
-    }
+
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
@@ -38,17 +54,5 @@ public class ChessPosition {
         return col;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        ChessPosition that = (ChessPosition) o;
-        return row == that.row && col == that.col;
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
-    }
 }
