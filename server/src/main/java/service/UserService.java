@@ -47,6 +47,6 @@ public class UserService {
         return new RegisterResult(registerRequest.username(), authToken, "Success");
     }
 
-    public LoginResult login(LoginRequest loginRequest) {}
+    public LoginResult login(LoginRequest loginRequest) {return null;}
     public void logout(LogoutRequest logoutRequest) {}
 }
