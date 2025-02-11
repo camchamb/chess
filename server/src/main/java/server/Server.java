@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataAccess.*;
+import service.GameService;
 import service.Requests.*;
 import service.UserService;
 import spark.*;
@@ -10,10 +11,11 @@ public class Server {
 
     public int run(int desiredPort) {
         UserDAO userAccess = new UserMemoryAccess();
-        GameDAO gameAccess = null;
+        GameDAO gameAccess = new GameMemoryAccess();
         AuthDAO authAccess = new AuthMemoryAccess();
 
         UserService userService = new UserService(userAccess, authAccess);
+        GameService gameService = new GameService(gameAccess);
 
         Spark.port(desiredPort);
 
@@ -40,9 +42,18 @@ public class Server {
             }
         });
 
-//        Spark.put("/", (request, response) -> {
-//            // Update something
-//        });
+        Spark.delete("/db", (request, response) -> {
+            try {
+                userService.clear();
+                gameService.clear();
+                response.body("{ }");
+                return response.body();
+            }
+            catch (DataAccessException ex) {
+                errorHandling(ex, request, response);
+                return response.body();
+            }
+        });
 //
 //        Spark.delete("/", (request, response) -> {
 //            // Delete something
