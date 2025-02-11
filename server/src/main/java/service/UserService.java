@@ -39,7 +39,23 @@ public class UserService {
         return new RegisterResult(registerRequest.username(), authToken);
     }
 
-    public LoginResult login(LoginRequest loginRequest) {return null;}
+    public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
+        if (loginRequest.password() == null || loginRequest.username() == null) {
+            throw new DataAccessException(500, "Error: invalid request");
+        }
+        UserData userData = userAccess.getUser(loginRequest.username());
+        if (userData == null) {
+            throw new DataAccessException(401, "Error: invalid username");
+        }
+        if (!userData.password().equals(loginRequest.password())) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+        String authToken = generateToken();
+        var authdata = new AuthData(authToken, loginRequest.username());
+        authAccess.createAuth(authdata);
+        return new LoginResult(loginRequest.username(), authToken);
+    }
+
     public void logout(LogoutRequest logoutRequest) {}
 
     public void clear() throws DataAccessException{
