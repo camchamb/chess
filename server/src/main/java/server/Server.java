@@ -70,8 +70,7 @@ public class Server {
     public void errorHandling(DataAccessException ex, Request req, Response res) {
         res.status(ex.getStatus());
         String message = ex.getMessage();
-        String error = ex.getError();
-        String json = "{\"message\": \"" + error + "\" }";
+        String json = "{\"message\": \"" + message + "\" }";
         System.out.println(json);
         res.body(json);
     }
