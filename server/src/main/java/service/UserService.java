@@ -26,7 +26,7 @@ public class UserService {
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         UserData userData = userAccess.getUser(registerRequest.username());
         if (userData != null) {
-            throw new DataAccessException("403", "Username Taken", "already taken");
+            throw new DataAccessException(403, "Username Taken", "already taken");
         }
         userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
         userAccess.createUser(userData);

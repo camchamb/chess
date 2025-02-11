@@ -11,7 +11,7 @@ public class Server {
     public int run(int desiredPort) {
         UserDAO userAccess = new UserMemoryAccess();
         GameDAO gameAccess = null;
-        AuthDAO authAccess = null;
+        AuthDAO authAccess = new AuthMemoryAccess();
 
         UserService userService = new UserService(userAccess, authAccess);
 
@@ -21,10 +21,9 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         // Show something
-        Spark.get("/", (request, response) -> {
-            // Show something
-        });
+//        Spark.post("/user", (request, response) -> "{ \"message\": \"This worked!\" }");
 
+//        Spark.post("/hello", (req, res) -> "Hello BYU!");
         Spark.post("/user", (request, response) -> {
             try {
                 var serializer = new Gson();
@@ -32,19 +31,22 @@ public class Server {
                 var regReq = serializer.fromJson(json, RegisterRequest.class);
                 RegisterResult regRes = userService.register(regReq);
                 response.body(serializer.toJson(regRes));
+                System.out.println(serializer.toJson(regRes));
+                return response.body();
             }
             catch (DataAccessException ex) {
                 errorHandling(ex, request, response);
+                return response.body();
             }
         });
 
-        Spark.put("/", (request, response) -> {
-            // Update something
-        });
-
-        Spark.delete("/", (request, response) -> {
-            // Delete something
-        });
+//        Spark.put("/", (request, response) -> {
+//            // Update something
+//        });
+//
+//        Spark.delete("/", (request, response) -> {
+//            // Delete something
+//        });
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -58,7 +60,8 @@ public class Server {
         res.status(ex.getStatus());
         String message = ex.getMessage();
         String error = ex.getError();
-        String json = "{message:" + message + "Error:" + error + "}";
+        String json = "{\"message\": \"" + error + "\" }";
+        System.out.println(json);
         res.body(json);
     }
 
