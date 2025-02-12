@@ -13,13 +13,13 @@ public class AuthMemoryAccess implements AuthDAO{
     }
 
     @Override
-    public AuthData getAuth(int authToken) throws DataAccessException {
+    public AuthData getAuth(String authToken) throws DataAccessException {
         return data.get(authToken);
     }
 
     @Override
-    public void deleteAuth(AuthData a) throws DataAccessException {
-        data.remove(a.authToken());
+    public void deleteAuth(String authToken) throws DataAccessException {
+        data.remove(authToken);
     }
 
     @Override
