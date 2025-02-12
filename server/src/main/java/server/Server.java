@@ -15,7 +15,7 @@ public class Server {
         AuthDAO authAccess = new AuthMemoryAccess();
 
         UserService userService = new UserService(userAccess, authAccess);
-        GameService gameService = new GameService(gameAccess);
+        GameService gameService = new GameService(gameAccess, authAccess);
 
         var serializer = new Gson();
 
@@ -58,6 +58,21 @@ public class Server {
                 String authToken = request.headers("authorization");
                 userService.logout(new LogoutRequest(authToken));
                 response.body("{ }");
+                return response.body();
+            }
+            catch (DataAccessException ex) {
+                errorHandling(ex, request, response);
+                return response.body();
+            }
+        });
+
+        Spark.get("/game", (request, response) -> {
+            try {
+                String authToken = request.headers("authorization");
+                var listGamesRequest = new ListGamesRequest(authToken);
+                ListGamesResult listGamesResult = gameService.listGames(listGamesRequest);
+                response.body(serializer.toJson(listGamesResult));
+                System.out.println(serializer.toJson(listGamesResult));
                 return response.body();
             }
             catch (DataAccessException ex) {
