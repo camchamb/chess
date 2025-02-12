@@ -32,7 +32,11 @@ public class GameMemoryAccess implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return new ArrayList<>(data.values());
+        var gameList = new ArrayList<GameData>();
+        for (var gameData : data.values()) {
+            gameList.add(new GameData(gameData.gameID(), gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), null));
+        }
+        return gameList;
     }
 
 
