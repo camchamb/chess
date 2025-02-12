@@ -53,6 +53,19 @@ public class Server {
             }
         });
 
+        Spark.delete("/session", (request, response) -> {
+            try {
+                String authToken = request.headers("authorization");
+                userService.logout(new LogoutRequest(authToken));
+                response.body("{ }");
+                return response.body();
+            }
+            catch (DataAccessException ex) {
+                errorHandling(ex, request, response);
+                return response.body();
+            }
+        });
+
         Spark.delete("/db", (request, response) -> {
             try {
                 userService.clear();
@@ -65,10 +78,6 @@ public class Server {
                 return response.body();
             }
         });
-//
-//        Spark.delete("/", (request, response) -> {
-//            // Delete something
-//        });
 
 
         //This line initializes the server and can be removed once you have a functioning endpoint
