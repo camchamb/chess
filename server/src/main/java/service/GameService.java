@@ -3,9 +3,11 @@ package service;
 import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
+import model.GameData;
+import service.Requests.CreateGameRequest;
+import service.Requests.CreateGameResult;
 import service.Requests.ListGamesRequest;
 import service.Requests.ListGamesResult;
-import service.Requests.LogoutRequest;
 
 
 public class GameService {
@@ -31,5 +33,17 @@ public class GameService {
         }
         var data = gameAccess.listGames();
         return new ListGamesResult(data);
+    }
+
+    public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException{
+        if (createGameRequest.authToken() == null) {
+            throw new DataAccessException(400, "Error: invalid request");
+        }
+        var authData = authAccess.getAuth(createGameRequest.authToken());
+        if (authData == null) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+        var gameID = gameAccess.createGame(createGameRequest.gameName());
+        return new CreateGameResult(gameID);
     }
 }
