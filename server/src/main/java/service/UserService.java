@@ -56,7 +56,16 @@ public class UserService {
         return new LoginResult(loginRequest.username(), authToken);
     }
 
-    public void logout(LogoutRequest logoutRequest) {}
+    public void logout(LogoutRequest logoutRequest) throws DataAccessException{
+        if (logoutRequest.authToken() == null) {
+            throw new DataAccessException(400, "Error: invalid request");
+        }
+        var authData = authAccess.getAuth(logoutRequest.authToken());
+        if (authData == null) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+        authAccess.deleteAuth(logoutRequest.authToken());
+    }
 
     public void clear() throws DataAccessException{
         userAccess.clear();
