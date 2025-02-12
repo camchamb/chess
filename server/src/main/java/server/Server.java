@@ -81,6 +81,21 @@ public class Server {
             }
         });
 
+        Spark.post("/game", (request, response) -> {
+            try {
+                var tempRequest = serializer.fromJson(request.body(), CreateGameRequest.class);
+                var createGameRequest = new CreateGameRequest(tempRequest.gameName(), request.headers("authorization"));
+                CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+                response.body(serializer.toJson(createGameResult));
+                System.out.println(serializer.toJson(createGameResult));
+                return response.body();
+            }
+            catch (DataAccessException ex) {
+                errorHandling(ex, request, response);
+                return response.body();
+            }
+        });
+
         Spark.delete("/db", (request, response) -> {
             try {
                 userService.clear();
