@@ -3,6 +3,7 @@ package dataAccess;
 import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +27,9 @@ public class GameMemoryAccess implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of(null);
+        return new ArrayList<>(data.values());
     }
+
 
     @Override
     public GameData updateGame(GameData u) throws DataAccessException {
