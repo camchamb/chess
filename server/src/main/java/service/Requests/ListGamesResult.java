@@ -1,0 +1,8 @@
+package service.Requests;
+
+import model.GameData;
+
+import java.util.Collection;
+
+public record ListGamesResult(Collection<GameData> gameList) {
+}
