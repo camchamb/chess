@@ -41,8 +41,8 @@ public class GameMemoryAccess implements GameDAO{
 
 
     @Override
-    public GameData updateGame(GameData u) throws DataAccessException {
-        return null;
+    public void updateGame(GameData u) throws DataAccessException {
+        data.put(u.gameID(), u);
     }
 
     @Override
