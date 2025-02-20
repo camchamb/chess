@@ -1,10 +1,8 @@
 package service;
 
-import dataAccess.AuthDAO;
-import dataAccess.DataAccessException;
-import dataAccess.GameDAO;
+import dataAccess.*;
 import model.GameData;
-import service.Requests.*;
+import service.requests.*;
 
 
 public class GameService {

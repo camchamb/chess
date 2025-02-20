@@ -39,15 +39,15 @@ public class ChessBoard implements Cloneable {
     public ChessBoard() {
     }
 
-//    @Override
-//    public String toString() {
-//        var builder = new StringBuilder();
-//        for (var item : board) {
-//            builder.append(Arrays.toString(item));
-//            builder.append(", ");
-//        }
-//        return builder.toString();
-//    }
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+        for (var item : board) {
+            builder.append(Arrays.toString(item));
+            builder.append(", ");
+        }
+        return builder.toString();
+    }
 
     @Override
     public boolean equals(Object o) {

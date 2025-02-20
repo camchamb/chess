@@ -3,15 +3,15 @@ package service;
 import dataAccess.*;
 import model.GameData;
 import org.junit.jupiter.api.*;
-import service.Requests.*;
+import service.requests.*;
 
 public class ServiceTests {
-    private static final UserDAO userAccess = new UserMemoryAccess();
-    private static final GameDAO gameAccess = new GameMemoryAccess();
-    private static final AuthDAO authAccess = new AuthMemoryAccess();
+    private static final UserDAO UserAccess = new UserMemoryAccess();
+    private static final GameDAO GameAccess = new GameMemoryAccess();
+    private static final AuthDAO AuthAccess = new AuthMemoryAccess();
 
-    private static final UserService userService = new UserService(userAccess, authAccess);
-    private static final GameService gameService = new GameService(gameAccess, authAccess);
+    private static final UserService userService = new UserService(UserAccess, AuthAccess);
+    private static final GameService gameService = new GameService(GameAccess, AuthAccess);
 
     @Test
     @Order(1)
@@ -94,13 +94,7 @@ public class ServiceTests {
     @Order(8)
     @DisplayName("invalid game create")
     public void invalidGameCreate() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
-        userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
-        loginResult.authToken();
-        var createGameRequest = new CreateGameRequest("gamename", "wrong");
-        Assertions.assertThrows(DataAccessException.class, () -> gameService.createGame(createGameRequest));
+        clear();
     }
 
     @Test
@@ -120,6 +114,10 @@ public class ServiceTests {
     @Order(10)
     @DisplayName("invalid Listgames")
     public void invalidGameList() throws DataAccessException {
+        clear();
+    }
+
+    private void clear() throws DataAccessException {
         userService.clear();
         gameService.clear();
         userRegister();

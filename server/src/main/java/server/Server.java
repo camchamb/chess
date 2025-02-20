@@ -3,7 +3,7 @@ package server;
 import com.google.gson.Gson;
 import dataAccess.*;
 import service.GameService;
-import service.Requests.*;
+import service.requests.*;
 import service.UserService;
 import spark.*;
 
@@ -25,6 +25,17 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
 
+        endpoints(serializer, userService, gameService);
+
+
+        //This line initializes the server and can be removed once you have a functioning endpoint
+        Spark.init();
+
+        Spark.awaitInitialization();
+        return Spark.port();
+    }
+
+    private void endpoints(Gson serializer, UserService userService, GameService gameService) {
         Spark.post("/user", (request, response) -> {
             try {
                 var regReq = serializer.fromJson(request.body(), RegisterRequest.class);
@@ -123,13 +134,6 @@ public class Server {
                 return response.body();
             }
         });
-
-
-        //This line initializes the server and can be removed once you have a functioning endpoint
-        Spark.init();
-
-        Spark.awaitInitialization();
-        return Spark.port();
     }
 
     public void errorHandling(DataAccessException ex, Request req, Response res) {
