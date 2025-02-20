@@ -4,10 +4,7 @@ import dataAccess.AuthDAO;
 import dataAccess.DataAccessException;
 import dataAccess.GameDAO;
 import model.GameData;
-import service.Requests.CreateGameRequest;
-import service.Requests.CreateGameResult;
-import service.Requests.ListGamesRequest;
-import service.Requests.ListGamesResult;
+import service.Requests.*;
 
 
 public class GameService {
@@ -45,5 +42,39 @@ public class GameService {
         }
         var gameID = gameAccess.createGame(createGameRequest.gameName());
         return new CreateGameResult(gameID);
+    }
+
+    public void joinGame(JoinGameRequest joinGameRequest) throws DataAccessException{
+        if (joinGameRequest.playerColor() == null) {
+            throw new DataAccessException(400, "Error: invalid request");
+        }
+        if (joinGameRequest.authToken() == null) {
+            throw new DataAccessException(400, "Error: invalid request");
+        }
+        if (!joinGameRequest.playerColor().equals("WHITE") && !joinGameRequest.playerColor().equals("BLACK")) {
+            throw new DataAccessException(400, "Error: invalid color");
+        }
+        var authData = authAccess.getAuth(joinGameRequest.authToken());
+        if (authData == null) {
+            throw new DataAccessException(401, "Error: unauthorized");
+        }
+        String username = authData.username();
+        GameData gameData = gameAccess.getGame(joinGameRequest.gameID());
+        if (gameData == null) {
+            throw new DataAccessException(400, "Error: no such gameID");
+        }
+        GameData updatedGameData;
+        if (joinGameRequest.playerColor().equals("WHITE") && gameData.whiteUsername() == null) {
+            updatedGameData = new GameData(gameData.gameID(), username,
+                    gameData.blackUsername(), gameData.gameName(), gameData.game());
+        }
+        else if (joinGameRequest.playerColor().equals("BLACK") && gameData.blackUsername() == null) {
+            updatedGameData = new GameData(gameData.gameID(), gameData.whiteUsername(),
+                    username, gameData.gameName(), gameData.game());
+        }
+        else {
+            throw new DataAccessException(403, "Error: color taken");
+        }
+        gameAccess.updateGame(updatedGameData);
     }
 }
