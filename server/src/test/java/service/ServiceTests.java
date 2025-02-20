@@ -6,22 +6,22 @@ import org.junit.jupiter.api.*;
 import service.requests.*;
 
 public class ServiceTests {
-    private static final UserDAO UserAccess = new UserMemoryAccess();
-    private static final GameDAO GameAccess = new GameMemoryAccess();
-    private static final AuthDAO AuthAccess = new AuthMemoryAccess();
+    private static final UserDAO USER_ACCESS = new UserMemoryAccess();
+    private static final GameDAO GAME_ACCESS = new GameMemoryAccess();
+    private static final AuthDAO AUTH_ACCESS = new AuthMemoryAccess();
 
-    private static final UserService userService = new UserService(UserAccess, AuthAccess);
-    private static final GameService gameService = new GameService(GameAccess, AuthAccess);
+    private static final UserService USER_SERVICE = new UserService(USER_ACCESS, AUTH_ACCESS);
+    private static final GameService GAME_SERVICE = new GameService(GAME_ACCESS, AUTH_ACCESS);
 
     @Test
     @Order(1)
     @DisplayName("user register")
     public void userRegister() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
+        USER_SERVICE.clear();
+        GAME_SERVICE.clear();
         var registerRequest = new RegisterRequest("username", "password", "email.com");
         var registerResult = new RegisterResult("username", "123456");
-        Assertions.assertEquals(registerResult.username(), userService.register(registerRequest).username(),
+        Assertions.assertEquals(registerResult.username(), USER_SERVICE.register(registerRequest).username(),
                 "Not right username");
     }
 
@@ -30,18 +30,18 @@ public class ServiceTests {
     @DisplayName("invalid user register")
     public void invalidUserRegister() {
         var invalidRequest = new RegisterRequest("ya", "no", null);
-        Assertions.assertThrows(DataAccessException.class, () -> userService.register(invalidRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> USER_SERVICE.register(invalidRequest));
     }
 
     @Test
     @Order(3)
     @DisplayName("user login")
     public void userLogin() throws DataAccessException {
-        userService.clear();
+        USER_SERVICE.clear();
         userRegister();
         var loginResult = new LoginResult("username", "123456");
         Assertions.assertEquals(loginResult.username(),
-                userService.login(new LoginRequest("username", "password")).username(),
+                USER_SERVICE.login(new LoginRequest("username", "password")).username(),
                 "Not right username");
     }
 
@@ -49,45 +49,45 @@ public class ServiceTests {
     @Order(4)
     @DisplayName("invalid user login")
     public void invalidUserLogin() throws DataAccessException {
-        userService.clear();
+        USER_SERVICE.clear();
         userRegister();
         var invalidRequest = new RegisterRequest("ya", "no", null);
-        Assertions.assertThrows(DataAccessException.class, () -> userService.register(invalidRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> USER_SERVICE.register(invalidRequest));
     }
 
     @Test
     @Order(5)
     @DisplayName("user logout")
     public void userLogout() throws DataAccessException {
-        userService.clear();
+        USER_SERVICE.clear();
         userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         var logoutRequest = new LogoutRequest(loginResult.authToken());
-        userService.logout(logoutRequest);
+        USER_SERVICE.logout(logoutRequest);
     }
 
     @Test
     @Order(6)
     @DisplayName("invalid user logout")
     public void invalidUserLogout() throws DataAccessException {
-        userService.clear();
+        USER_SERVICE.clear();
         userRegister();
-        userService.login(new LoginRequest("username", "password"));
+        USER_SERVICE.login(new LoginRequest("username", "password"));
         var invalidLogoutRequest = new LogoutRequest("1234");
-        Assertions.assertThrows(DataAccessException.class, () ->  userService.logout(invalidLogoutRequest));
+        Assertions.assertThrows(DataAccessException.class, () ->  USER_SERVICE.logout(invalidLogoutRequest));
     }
 
     @Test
     @Order(7)
     @DisplayName("Create game")
     public void gameCreate() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
+        USER_SERVICE.clear();
+        GAME_SERVICE.clear();
         userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         String authToken = loginResult.authToken();
         var createGameRequest = new CreateGameRequest("gamename", authToken);
-        gameService.createGame(createGameRequest);
+        GAME_SERVICE.createGame(createGameRequest);
     }
 
     @Test
@@ -101,13 +101,13 @@ public class ServiceTests {
     @Order(9)
     @DisplayName("List games")
     public void gameList() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
+        USER_SERVICE.clear();
+        GAME_SERVICE.clear();
         gameCreate();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         String authToken = loginResult.authToken();
         var createGameRequest = new CreateGameRequest("gamename", authToken);
-        gameService.createGame(createGameRequest);
+        GAME_SERVICE.createGame(createGameRequest);
     }
 
     @Test
@@ -118,29 +118,29 @@ public class ServiceTests {
     }
 
     private void clear() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
+        USER_SERVICE.clear();
+        GAME_SERVICE.clear();
         userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         loginResult.authToken();
         var createGameRequest = new CreateGameRequest("gamename", "wrong");
-        Assertions.assertThrows(DataAccessException.class, () -> gameService.createGame(createGameRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> GAME_SERVICE.createGame(createGameRequest));
     }
 
     @Test
     @Order(11)
     @DisplayName("join game")
     public void joinGame() throws DataAccessException {
-        userService.clear();
-        gameService.clear();
+        USER_SERVICE.clear();
+        GAME_SERVICE.clear();
         userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         String authToken = loginResult.authToken();
         var createGameRequest = new CreateGameRequest("gamename", authToken);
-        var createGameResult = gameService.createGame(createGameRequest);
+        var createGameResult = GAME_SERVICE.createGame(createGameRequest);
         var joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), authToken);
-        gameService.joinGame(joinGameRequest);
-        var listGamesResult = gameService.listGames(new ListGamesRequest(authToken));
+        GAME_SERVICE.joinGame(joinGameRequest);
+        var listGamesResult = GAME_SERVICE.listGames(new ListGamesRequest(authToken));
         var testObject = new GameData(createGameResult.gameID(), "username", null, "gamename", null);
         assert listGamesResult.games().contains(testObject);
     }
@@ -149,14 +149,14 @@ public class ServiceTests {
     @Order(12)
     @DisplayName("invalid join game")
     public void invalidJoinGame() throws DataAccessException {
-        gameService.clear();
+        GAME_SERVICE.clear();
         userRegister();
-        var loginResult = userService.login(new LoginRequest("username", "password"));
+        var loginResult = USER_SERVICE.login(new LoginRequest("username", "password"));
         String authToken = loginResult.authToken();
         var createGameRequest = new CreateGameRequest("gamename", authToken);
-        var createGameResult = gameService.createGame(createGameRequest);
+        var createGameResult = GAME_SERVICE.createGame(createGameRequest);
         var badJoinGameRequest = new JoinGameRequest("GREEN", createGameResult.gameID(), authToken);
-        Assertions.assertThrows(DataAccessException.class, () -> gameService.joinGame(badJoinGameRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> GAME_SERVICE.joinGame(badJoinGameRequest));
     }
 
     @Test
@@ -164,9 +164,9 @@ public class ServiceTests {
     @DisplayName("Check clear")
     public void clearAll() throws DataAccessException {
         userRegister();
-        userService.clear();
+        USER_SERVICE.clear();
         var loginRequest = new LoginRequest("username", "password");
-        Assertions.assertThrows(DataAccessException.class, () -> userService.login(loginRequest));
+        Assertions.assertThrows(DataAccessException.class, () -> USER_SERVICE.login(loginRequest));
     }
 
 }
