@@ -31,12 +31,14 @@ public class GameSqlAccess implements GameDAO{
 
     @Override
     public void updateGame(GameData u) throws DataAccessException {
-
+        var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
+        executeUpdate(statement, u.whiteUsername(), u.blackUsername(), u.gameName(), u.game(), u.gameID());
     }
 
     @Override
     public void clear() throws DataAccessException {
-
+        var statement = "DELETE FROM game";
+        executeUpdate(statement);
     }
 
     private int executeUpdate(String statement, Object... params) throws DataAccessException {
