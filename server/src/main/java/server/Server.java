@@ -8,11 +8,18 @@ import service.UserService;
 import spark.*;
 
 public class Server {
+    UserDAO userAccess;
+    GameDAO gameAccess;
+    AuthDAO authAccess;
 
     public int run(int desiredPort) {
-        UserDAO userAccess = new UserMemoryAccess();
-        GameDAO gameAccess = new GameMemoryAccess();
-        AuthDAO authAccess = new AuthMemoryAccess();
+        try {
+            userAccess = new UserSqlAccess();
+            gameAccess = new GameMemoryAccess();
+            authAccess = new AuthMemoryAccess();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         UserService userService = new UserService(userAccess, authAccess);
         GameService gameService = new GameService(gameAccess, authAccess);
