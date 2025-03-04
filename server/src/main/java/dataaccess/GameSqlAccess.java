@@ -1,8 +1,10 @@
 package dataaccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
+import service.requests.RegisterRequest;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -12,6 +14,8 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
 public class GameSqlAccess implements GameDAO{
+    private final Gson serializer = new Gson();
+
     public GameSqlAccess() throws DataAccessException {
         configureDatabase();
     }
@@ -19,7 +23,8 @@ public class GameSqlAccess implements GameDAO{
     @Override
     public int createGame(String gameName) throws DataAccessException {
         var statement = "INSERT INTO game (gameName, game) VALUES(?, ?)";
-        return executeUpdate(statement, gameName, new ChessGame());
+        var game = serializer.toJson(new ChessGame(), ChessGame.class);
+        return executeUpdate(statement, gameName, game);
     }
 
     @Override
@@ -34,8 +39,8 @@ public class GameSqlAccess implements GameDAO{
                         var blackUsername = rs.getString("blackUsername");
                         var gameName = rs.getString("gameName");
                         var game = rs.getString("game");
-
-                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                        var gameObject = serializer.fromJson(game, ChessGame.class);
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, gameObject);
                     }
                 }
             }
@@ -43,7 +48,6 @@ public class GameSqlAccess implements GameDAO{
             throw new RuntimeException(e);
         }
         return null;
-    }
     }
 
     @Override
@@ -54,7 +58,8 @@ public class GameSqlAccess implements GameDAO{
     @Override
     public void updateGame(GameData u) throws DataAccessException {
         var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
-        executeUpdate(statement, u.whiteUsername(), u.blackUsername(), u.gameName(), u.game(), u.gameID());
+        var game = serializer.toJson(u.game(), ChessGame.class);
+        executeUpdate(statement, u.whiteUsername(), u.blackUsername(), u.gameName(), game, u.gameID());
     }
 
     @Override
