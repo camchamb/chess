@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import model.UserData;
 
 import java.sql.SQLException;
 
@@ -14,11 +15,27 @@ public class AuthSqlAccess implements AuthDAO{
 
     @Override
     public void createAuth(AuthData a) throws DataAccessException {
-
+        var statement = "INSERT INTO auth (authToken, username) VALUES(?, ?)";
+        executeUpdate(statement, a.authToken(), a.username());
     }
 
     @Override
     public AuthData getAuth(String authToken) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT authToken, username FROM auth WHERE authToken = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setString(1, authToken);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        var username = rs.getString("username");
+
+                        return new AuthData(authToken, username);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
