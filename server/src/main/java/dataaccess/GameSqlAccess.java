@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import model.AuthData;
 import model.GameData;
 
 import java.sql.SQLException;
@@ -16,12 +18,32 @@ public class GameSqlAccess implements GameDAO{
 
     @Override
     public int createGame(String gameName) throws DataAccessException {
-        return 0;
+        var statement = "INSERT INTO game (gameName, game) VALUES(?, ?)";
+        return executeUpdate(statement, gameName, new ChessGame());
     }
 
     @Override
     public GameData getGame(int gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT whiteUsername, blackUsername, gameName, game FROM game WHERE gameID = ?";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if (rs.next()) {
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var gameName = rs.getString("gameName");
+                        var game = rs.getString("game");
+
+                        return new GameData(gameID, whiteUsername, blackUsername, gameName, game);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return null;
+    }
     }
 
     @Override
@@ -71,10 +93,10 @@ public class GameSqlAccess implements GameDAO{
             var createUserTable = """
             CREATE TABLE  IF NOT EXISTS game (
                 gameID INT NOT NULL AUTO_INCREMENT,
-                whiteUsername VARCHAR(255) NOT NULL,
-                blackUsername VARCHAR(255) NOT NULL,
-                gameName VARCHAR(255) NOT NULL,
-                game VARCHAR(255) NOT NULL,
+                whiteUsername VARCHAR(255) DEFAULT NULL,
+                blackUsername VARCHAR(255) DEFAULT NULL,
+                gameName VARCHAR(255) DEFAULT NULL,
+                game VARCHAR(255) DEFAULT NULL,
                 PRIMARY KEY (gameID),
                 FOREIGN KEY (whiteUsername) REFERENCES user(username) ON DELETE CASCADE,
                 FOREIGN KEY (blackUsername) REFERENCES user(username) ON DELETE CASCADE
