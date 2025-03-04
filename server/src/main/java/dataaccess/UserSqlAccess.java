@@ -26,6 +26,8 @@ public class UserSqlAccess implements UserDAO{
 
     @Override
     public void createUser(UserData u) throws DataAccessException {
+        var statement = "INSERT INTO user (username, password, email) VALUES(?, ?, ?)";
+        executeUpdate(statement, u.username(), u.password(), u.email());
     }
 
     @Override
