@@ -83,7 +83,7 @@ public class AuthSqlAccess implements AuthDAO{
                 authToken VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
                 PRIMARY KEY (authToken),
-                FOREIGN KEY (username) REFERENCES user(username)
+                FOREIGN KEY (username) REFERENCES user(username) ON DELETE CASCADE
             )""";
 
             try (var preparedStatement = conn.prepareStatement(createUserTable)) {
