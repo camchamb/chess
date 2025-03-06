@@ -7,6 +7,7 @@ import model.GameData;
 import service.requests.RegisterRequest;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,7 +53,24 @@ public class GameSqlAccess implements GameDAO{
 
     @Override
     public Collection<GameData> listGames() throws DataAccessException {
-        return List.of();
+        var allGames = new ArrayList<GameData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT gameID, whiteUsername, blackUsername, gameName FROM game";
+            try (var preparedStatement = conn.prepareStatement(statement)) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        var gameID = rs.getInt("gameID");
+                        var whiteUsername = rs.getString("whiteUsername");
+                        var blackUsername = rs.getString("blackUsername");
+                        var gameName = rs.getString("gameName");
+                        allGames.add(new GameData(gameID, whiteUsername, blackUsername, gameName, null));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return allGames;
     }
 
     @Override
@@ -101,7 +119,7 @@ public class GameSqlAccess implements GameDAO{
                 whiteUsername VARCHAR(255) DEFAULT NULL,
                 blackUsername VARCHAR(255) DEFAULT NULL,
                 gameName VARCHAR(255) DEFAULT NULL,
-                game VARCHAR(255) DEFAULT NULL,
+                game TEXT DEFAULT NULL,
                 PRIMARY KEY (gameID),
                 FOREIGN KEY (whiteUsername) REFERENCES user(username) ON DELETE CASCADE,
                 FOREIGN KEY (blackUsername) REFERENCES user(username) ON DELETE CASCADE
