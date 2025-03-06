@@ -160,47 +160,39 @@ public class DataAccessTests {
     }
 
 
-//
-//    @Test
-//    @Order(11)
-//    @DisplayName("join game")
-//    public void joinGame() throws DataAccessException {
-//        USER_ACCESS.clear();
-//        GAME_SERVICE.clear();
-//        userRegister();
-//        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-//        String authToken = loginResult.authToken();
-//        var createGameRequest = new CreateGameRequest("gamename", authToken);
-//        var createGameResult = GAME_SERVICE.createGame(createGameRequest);
-//        var joinGameRequest = new JoinGameRequest("WHITE", createGameResult.gameID(), authToken);
-//        GAME_SERVICE.joinGame(joinGameRequest);
-//        var listGamesResult = GAME_SERVICE.listGames(new ListGamesRequest(authToken));
-//        var testObject = new GameData(createGameResult.gameID(), "username", null, "gamename", null);
-//        assert listGamesResult.games().contains(testObject);
-//    }
-//
-//    @Test
-//    @Order(12)
-//    @DisplayName("invalid join game")
-//    public void invalidJoinGame() throws DataAccessException {
-//        GAME_SERVICE.clear();
-//        userRegister();
-//        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-//        String authToken = loginResult.authToken();
-//        var createGameRequest = new CreateGameRequest("gamename", authToken);
-//        var createGameResult = GAME_SERVICE.createGame(createGameRequest);
-//        var badJoinGameRequest = new JoinGameRequest("GREEN", createGameResult.gameID(), authToken);
-//        Assertions.assertThrows(DataAccessException.class, () -> GAME_SERVICE.joinGame(badJoinGameRequest));
-//    }
-//
-//    @Test
-//    @Order(12)
-//    @DisplayName("Check clear")
-//    public void clearAll() throws DataAccessException {
-//        userRegister();
-//        USER_ACCESS.clear();
-//        var loginRequest = new LoginRequest("username", "password");
-//        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.login(loginRequest));
-//    }
-//
+    @Test
+    @Order(11)
+    @DisplayName("create game")
+    public void joinGame() throws DataAccessException {
+        GAME_ACCESS.createGame("gamename");
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("invalid create game")
+    public void invalidJoinGame() throws DataAccessException {
+        var gameid = GAME_ACCESS.createGame("gamename");
+        var gameid2 = GAME_ACCESS.createGame("gamename");
+        assert gameid != gameid2;
+    }
+
+    @Test
+    @Order(12)
+    @DisplayName("get Game")
+    public void clearAll() throws DataAccessException {
+        var gameid = GAME_ACCESS.createGame("gamename");
+        var loginRequest = new LoginRequest("username", "password");
+        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.login(loginRequest));
+    }
+
+    @Test
+    @Order(13)
+    @DisplayName("invalid get game")
+    public void igetgame() throws DataAccessException {
+        userRegister();
+        USER_ACCESS.clear();
+        var loginRequest = new LoginRequest("username", "password");
+        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.login(loginRequest));
+    }
+
 }
