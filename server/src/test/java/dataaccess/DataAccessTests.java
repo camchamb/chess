@@ -10,6 +10,9 @@ import service.GameService;
 import service.UserService;
 import service.requests.*;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class DataAccessTests {
     private static final UserDAO USER_ACCESS;
     private static final GameDAO GAME_ACCESS;
@@ -189,6 +192,24 @@ public class DataAccessTests {
     @DisplayName("invalid get game")
     public void igetgame() throws DataAccessException {
         Assertions.assertNull(GAME_ACCESS.getGame(1234));
+    }
+
+    @Test
+    @Order(14)
+    @DisplayName("list Games")
+    public void listGames() throws DataAccessException {
+        GAME_ACCESS.createGame("gamename");
+        var list = GAME_ACCESS.listGames();
+        for (var game : list) {
+            Assertions.assertEquals("gamename", game.gameName());
+        }
+    }
+
+    @Test
+    @Order(15)
+    @DisplayName("invalid list game")
+    public void ilistgame() throws DataAccessException {
+        Assertions.assertEquals(new ArrayList<>(), GAME_ACCESS.listGames());
     }
 
 }
