@@ -181,18 +181,14 @@ public class DataAccessTests {
     @DisplayName("get Game")
     public void clearAll() throws DataAccessException {
         var gameid = GAME_ACCESS.createGame("gamename");
-        var loginRequest = new LoginRequest("username", "password");
-        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.login(loginRequest));
+        Assertions.assertEquals("gamename", GAME_ACCESS.getGame(gameid).gameName());
     }
 
     @Test
     @Order(13)
     @DisplayName("invalid get game")
     public void igetgame() throws DataAccessException {
-        userRegister();
-        USER_ACCESS.clear();
-        var loginRequest = new LoginRequest("username", "password");
-        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.login(loginRequest));
+        Assertions.assertNull(GAME_ACCESS.getGame(1234));
     }
 
 }
