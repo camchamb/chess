@@ -15,8 +15,8 @@ public class Server {
     public int run(int desiredPort) {
         try {
             userAccess = new UserSqlAccess();
-            gameAccess = new GameMemoryAccess();
-            authAccess = new AuthMemoryAccess();
+            gameAccess = new GameSqlAccess();
+            authAccess = new AuthSqlAccess();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
