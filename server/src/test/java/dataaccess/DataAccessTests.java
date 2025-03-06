@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
@@ -101,45 +102,40 @@ public class DataAccessTests {
 
     @Test
     @Order(5)
-    @DisplayName("user logout")
+    @DisplayName("create Auth")
     public void userLogout() throws DataAccessException {
-        USER_ACCESS.clear();
-        userRegister();
-        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-        var logoutRequest = new LogoutRequest(loginResult.authToken());
-        USER_ACCESS.logout(logoutRequest);
+        var user = new UserData("username", "password", "email.com");
+        USER_ACCESS.createUser(user);
+        var auth = new AuthData("55-24-AJ", "username");
+        AUTH_ACCESS.createAuth(auth);
     }
 
     @Test
     @Order(6)
-    @DisplayName("invalid user logout")
+    @DisplayName("invalid create Auth")
     public void invalidUserLogout() throws DataAccessException {
-        USER_ACCESS.clear();
-        userRegister();
-        USER_ACCESS.login(new LoginRequest("username", "password"));
-        var invalidLogoutRequest = new LogoutRequest("1234");
-        Assertions.assertThrows(DataAccessException.class, () ->  USER_ACCESS.logout(invalidLogoutRequest));
+        var auth = new AuthData("55-24-AJ", "username");
+        Assertions.assertThrows(DataAccessException.class, () -> AUTH_ACCESS.createAuth(auth));
     }
-//
-//    @Test
-//    @Order(7)
-//    @DisplayName("Create game")
-//    public void gameCreate() throws DataAccessException {
-//        USER_ACCESS.clear();
-//        GAME_SERVICE.clear();
-//        userRegister();
-//        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-//        String authToken = loginResult.authToken();
-//        var createGameRequest = new CreateGameRequest("gamename", authToken);
-//        GAME_SERVICE.createGame(createGameRequest);
-//    }
-//
-//    @Test
-//    @Order(8)
-//    @DisplayName("invalid game create")
-//    public void invalidGameCreate() throws DataAccessException {
-//        clear();
-//    }
+
+    @Test
+    @Order(7)
+    @DisplayName("Get Auth")
+    public void gameCreate() throws DataAccessException {
+        var user = new UserData("username", "password", "email.com");
+        USER_ACCESS.createUser(user);
+        var auth = new AuthData("55-24-AJ", "username");
+        AUTH_ACCESS.createAuth(auth);
+        Assertions.assertEquals(user.username(), AUTH_ACCESS.getAuth("55-24-AJ").username(),
+                "Not right username");
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("invalid get Auth")
+    public void invalidGameCreate() throws DataAccessException {
+        Assertions.assertThrows(DataAccessException.class, () -> AUTH_ACCESS.getAuth("invalid"));
+    }
 //
 //    @Test
 //    @Order(9)
