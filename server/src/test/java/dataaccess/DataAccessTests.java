@@ -95,9 +95,9 @@ public class DataAccessTests {
 
     @Test
     @Order(4)
-    @DisplayName("invalid user login")
+    @DisplayName("invalid get user")
     public void invalidUserLogin() throws DataAccessException {
-        Assertions.assertThrows(DataAccessException.class, () -> USER_ACCESS.getUser("invalidRequest"));
+        Assertions.assertEquals(null, USER_ACCESS.getUser("invalidRequest"));
     }
 
     @Test
@@ -134,38 +134,32 @@ public class DataAccessTests {
     @Order(8)
     @DisplayName("invalid get Auth")
     public void invalidGameCreate() throws DataAccessException {
-        Assertions.assertThrows(DataAccessException.class, () -> AUTH_ACCESS.getAuth("invalid"));
+        Assertions.assertEquals(null, AUTH_ACCESS.getAuth("invalidRequest"));
     }
-//
-//    @Test
-//    @Order(9)
-//    @DisplayName("List games")
-//    public void gameList() throws DataAccessException {
-//        USER_ACCESS.clear();
-//        GAME_SERVICE.clear();
-//        gameCreate();
-//        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-//        String authToken = loginResult.authToken();
-//        var createGameRequest = new CreateGameRequest("gamename", authToken);
-//        GAME_SERVICE.createGame(createGameRequest);
-//    }
-//
-//    @Test
-//    @Order(10)
-//    @DisplayName("invalid Listgames")
-//    public void invalidGameList() throws DataAccessException {
-//        clear();
-//    }
-//
-//    private void clear() throws DataAccessException {
-//        USER_ACCESS.clear();
-//        GAME_SERVICE.clear();
-//        userRegister();
-//        var loginResult = USER_ACCESS.login(new LoginRequest("username", "password"));
-//        loginResult.authToken();
-//        var createGameRequest = new CreateGameRequest("gamename", "wrong");
-//        Assertions.assertThrows(DataAccessException.class, () -> GAME_SERVICE.createGame(createGameRequest));
-//    }
+
+    @Test
+    @Order(9)
+    @DisplayName("Delete Auth")
+    public void gameList() throws DataAccessException {
+        var user = new UserData("username", "password", "email.com");
+        USER_ACCESS.createUser(user);
+        var auth = new AuthData("55-24-AJ", "username");
+        AUTH_ACCESS.createAuth(auth);
+        Assertions.assertEquals(user.username(), AUTH_ACCESS.getAuth("55-24-AJ").username(),
+                "Not right username");
+        AUTH_ACCESS.deleteAuth(auth.authToken());
+        Assertions.assertNull(AUTH_ACCESS.getAuth("55-24-AJ"), "Not right username");
+    }
+
+    @Test
+    @Order(10)
+    @DisplayName("invalid delete Auth")
+    public void invalidGameList() throws DataAccessException {
+        AUTH_ACCESS.deleteAuth("Invalid");
+        Assertions.assertNull(AUTH_ACCESS.getAuth("55-24-AJ"), "Not null");
+    }
+
+
 //
 //    @Test
 //    @Order(11)
