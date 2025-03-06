@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 
 import java.sql.SQLException;
 
@@ -28,7 +27,6 @@ public class AuthSqlAccess implements AuthDAO{
                 try (var rs = preparedStatement.executeQuery()) {
                     if (rs.next()) {
                         var username = rs.getString("username");
-
                         return new AuthData(authToken, username);
                     }
                 }
