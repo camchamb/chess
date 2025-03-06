@@ -3,6 +3,7 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.*;
 
 import java.util.UUID;
@@ -29,7 +30,8 @@ public class UserService {
         if (userData != null) {
             throw new DataAccessException(403, "Error: already taken");
         }
-        userData = new UserData(registerRequest.username(), registerRequest.password(), registerRequest.email());
+        String hashedPassword = BCrypt.hashpw(registerRequest.password(), BCrypt.gensalt());
+        userData = new UserData(registerRequest.username(), hashedPassword, registerRequest.email());
         userAccess.createUser(userData);
         String authToken = generateToken();
         AuthData authData = new AuthData(authToken, registerRequest.username());
@@ -45,7 +47,7 @@ public class UserService {
         if (userData == null) {
             throw new DataAccessException(401, "Error: invalid username");
         }
-        if (!userData.password().equals(loginRequest.password())) {
+        if (!BCrypt.checkpw(loginRequest.password(), userData.password())) {
             throw new DataAccessException(401, "Error: unauthorized");
         }
         String authToken = generateToken();
