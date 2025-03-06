@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -209,6 +210,25 @@ public class DataAccessTests {
     @Order(15)
     @DisplayName("invalid list game")
     public void ilistgame() throws DataAccessException {
+        Assertions.assertEquals(new ArrayList<>(), GAME_ACCESS.listGames());
+    }
+
+    @Test
+    @Order(16)
+    @DisplayName("update Games")
+    public void updateGames() throws DataAccessException {
+        var gameId = GAME_ACCESS.createGame("gamename");
+        var game = new GameData(gameId, null, null, "newGameName", new ChessGame());
+        GAME_ACCESS.updateGame(game);
+        Assertions.assertEquals("newGameName", GAME_ACCESS.getGame(gameId).gameName());
+    }
+
+    @Test
+    @Order(17)
+    @DisplayName("invalid update game")
+    public void iupdategame() throws DataAccessException {
+        var game = new GameData(1234, null, null, "newGameName", new ChessGame());
+        GAME_ACCESS.updateGame(game);
         Assertions.assertEquals(new ArrayList<>(), GAME_ACCESS.listGames());
     }
 
