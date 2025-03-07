@@ -14,7 +14,7 @@ import java.util.List;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class GameSqlAccess implements GameDAO{
+public class GameSqlAccess implements GameDAO {
     private final Gson serializer = new Gson();
 
     public GameSqlAccess() throws DataAccessException {
@@ -25,7 +25,7 @@ public class GameSqlAccess implements GameDAO{
     public int createGame(String gameName) throws DataAccessException {
         var statement = "INSERT INTO game (gameName, game) VALUES(?, ?)";
         var game = serializer.toJson(new ChessGame(), ChessGame.class);
-        return executeUpdate(statement, gameName, game);
+        return SqlUtils.executeUpdate(statement, gameName, game);
     }
 
     @Override
@@ -77,43 +77,17 @@ public class GameSqlAccess implements GameDAO{
     public void updateGame(GameData u) throws DataAccessException {
         var statement = "UPDATE game SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameID = ?";
         var game = serializer.toJson(u.game(), ChessGame.class);
-        executeUpdate(statement, u.whiteUsername(), u.blackUsername(), u.gameName(), game, u.gameID());
+        SqlUtils.executeUpdate(statement, u.whiteUsername(), u.blackUsername(), u.gameName(), game, u.gameID());
     }
 
     @Override
     public void clear() throws DataAccessException {
         var statement = "DELETE FROM game";
-        executeUpdate(statement);
-    }
-
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
+        SqlUtils.executeUpdate(statement);
     }
 
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-
-            var createUserTable = """
+        var createUserTable = """
             CREATE TABLE  IF NOT EXISTS game (
                 gameID INT NOT NULL AUTO_INCREMENT,
                 whiteUsername VARCHAR(255) DEFAULT NULL,
@@ -125,13 +99,6 @@ public class GameSqlAccess implements GameDAO{
                 FOREIGN KEY (blackUsername) REFERENCES user(username) ON DELETE CASCADE
             )""";
 
-            try (var preparedStatement = conn.prepareStatement(createUserTable)) {
-                preparedStatement.executeUpdate();
-            }
-        }
-        catch (SQLException ex) {
-            throw new DataAccessException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-
-    }
+            SqlUtils.configureDatabase(createUserTable);
+}
 }
