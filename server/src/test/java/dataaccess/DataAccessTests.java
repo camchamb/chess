@@ -71,9 +71,9 @@ public class DataAccessTests {
     @Order(1)
     @DisplayName("create user")
     public void userRegister() throws DataAccessException {
-        var user = new UserData("username", "password", "email.com");
+        var user = new UserData("test", "password", "email.com");
         USER_ACCESS.createUser(user);
-        Assertions.assertEquals(user.username(), USER_ACCESS.getUser("username").username(),
+        Assertions.assertEquals(user.username(), USER_ACCESS.getUser("test").username(),
                 "Not right username");
     }
 
