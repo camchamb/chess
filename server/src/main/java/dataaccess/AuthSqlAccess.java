@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 import static java.sql.Types.NULL;
 
-public class AuthSqlAccess implements AuthDAO{
+public class AuthSqlAccess implements AuthDAO {
     public AuthSqlAccess() throws DataAccessException {
         configureDatabase();
     }
@@ -15,7 +15,7 @@ public class AuthSqlAccess implements AuthDAO{
     @Override
     public void createAuth(AuthData a) throws DataAccessException {
         var statement = "INSERT INTO auth (authToken, username) VALUES(?, ?)";
-        executeUpdate(statement, a.authToken(), a.username());
+        SqlUtils.executeUpdate(statement, a.authToken(), a.username());
     }
 
     @Override
@@ -40,43 +40,17 @@ public class AuthSqlAccess implements AuthDAO{
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM auth WHERE authToken = ?";
-        executeUpdate(statement, authToken);
+        SqlUtils.executeUpdate(statement, authToken);
     }
 
     @Override
     public void clear() throws DataAccessException {
         var statement = "DELETE FROM auth";
-        executeUpdate(statement);
-    }
-
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i];
-                    if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof Integer p) ps.setInt(i + 1, p);
-                    else if (param == null) ps.setNull(i + 1, NULL);
-                }
-                ps.executeUpdate();
-
-                var rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException(500, String.format("unable to update database: %s, %s", statement, e.getMessage()));
-        }
+        SqlUtils.executeUpdate(statement);
     }
 
     private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
-
-            var createUserTable = """
+        var createUserTable = """
             CREATE TABLE  IF NOT EXISTS auth (
                 authToken VARCHAR(255) NOT NULL,
                 username VARCHAR(255) NOT NULL,
@@ -84,13 +58,6 @@ public class AuthSqlAccess implements AuthDAO{
                 FOREIGN KEY (username) REFERENCES user(username) ON DELETE CASCADE
             )""";
 
-            try (var preparedStatement = conn.prepareStatement(createUserTable)) {
-                preparedStatement.executeUpdate();
-            }
-        }
-        catch (SQLException ex) {
-            throw new DataAccessException(500, String.format("Unable to configure database: %s", ex.getMessage()));
-        }
-
-    }
+        SqlUtils.configureDatabase(createUserTable);
+}
 }
