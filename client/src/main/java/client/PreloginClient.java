@@ -7,13 +7,13 @@ import dataaccess.DataAccessException;
 
 import java.util.Arrays;
 
-public class ChessClient {
+public class PreloginClient {
     private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
 //    private State state = State.SIGNEDOUT;
 
-    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
+    public PreloginClient(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
 //        this.notificationHandler = notificationHandler;
@@ -39,7 +39,13 @@ public class ChessClient {
         }
     }
 
-    public String help() {return "help stuff";}
+    public String help() {
+        return """
+                register <username> <password> <email> - to register
+                login <username> <password> - to login
+                quit - stop client
+                help - all commands
+                """;}
 
     public String register(String... params) throws DataAccessException {
         if (params.length < 3) {
