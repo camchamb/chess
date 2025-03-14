@@ -6,24 +6,32 @@ import com.sun.nio.sctp.NotificationHandler;
 
 import java.util.Scanner;
 
-import static java.awt.Color.BLUE;
-
 public class Repl implements NotificationHandler {
-    private final ChessClient client;
+    private final PreloginClient preClient;
+    private final PostloginClient postClient;
+    private final GamePlayClient gameClient;
+    public State state = State.PreloginClient;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl, this);
+        preClient = new PreloginClient(serverUrl, this);
+        postClient = new PostloginClient(serverUrl, this);
+        gameClient = new GamePlayClient(serverUrl, this);
     }
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var result = "";
+        System.out.print("\n" + preClient.eval("help") + "\n");
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
             try {
-                result = client.eval(line);
-                System.out.print(BLUE + result);
+                result = switch (state) {
+                    case PreloginClient -> preClient.eval(line);
+                    case PostloginClient -> postClient.eval(line);
+                    case GamePlayClient -> gameClient.eval(line);
+                };
+                System.out.println("\n" + result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
