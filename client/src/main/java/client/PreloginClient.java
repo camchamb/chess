@@ -57,7 +57,7 @@ public class PreloginClient {
 //                case "adopt" -> adoptPet(params);
 //                case "adoptall" -> adoptAllPets();
             case "quit" -> "quit";
-            default -> preHelp();
+            default -> postHelp();
         };
     }
 
@@ -70,7 +70,7 @@ public class PreloginClient {
 //                case "adopt" -> adoptPet(params);
 //                case "adoptall" -> adoptAllPets();
             case "quit" -> "quit";
-            default -> preHelp();
+            default -> gameHelp();
         };
     }
 
@@ -79,8 +79,7 @@ public class PreloginClient {
                 register <username> <password> <email> - to register
                 login <username> <password> - to login
                 quit - stop client
-                help - all commands
-                """;}
+                help - all commands""";}
 
     public String postHelp() {
         return """
@@ -90,15 +89,13 @@ public class PreloginClient {
                 observe <ID> - observe game
                 logout - logout of server
                 quit - stop client
-                help - all commands
-                """;}
+                help - all commands""";}
 
     public String gameHelp() {
         return """
                 future work
                 quit - stop client
-                help - all commands
-                """;}
+                help - all commands""";}
 
     public String register(String... params) throws DataAccessException {
         if (params.length < 3) {
