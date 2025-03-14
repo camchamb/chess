@@ -108,6 +108,7 @@ public class PreloginClient {
         var password = params[1];
         var email = params[2];
         var user = server.addUser(new UserData(username, password, email));
+        state = State.PostloginClient;
         return "Registered:" + user.username();
     }
 }
