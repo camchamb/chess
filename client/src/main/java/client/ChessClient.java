@@ -50,7 +50,7 @@ public class ChessClient {
         return switch (cmd) {
             case "create" -> create(params);
             case "list" -> list();
-//                case "list" -> listPets();
+            case "join" -> join(params);
 //                case "signout" -> signOut();
 //                case "adopt" -> adoptPet(params);
 //                case "adoptall" -> adoptAllPets();
@@ -134,6 +134,15 @@ public class ChessClient {
         return "Games: " + result;
     }
 
-
+    public String join(String... params) throws DataAccessException {
+        if (params.length < 2) {
+            throw new DataAccessException(400, "Expected: <ID> <COLOR>");
+        }
+        var gameID = Integer.parseInt(params[0]);
+        var color = params[1].toUpperCase();
+        server.join(new JoinGameRequest(color, gameID, authToken));
+        state = State.GamePlayClient;
+        return "Joined game: " + gameID;
+    }
 
 }
