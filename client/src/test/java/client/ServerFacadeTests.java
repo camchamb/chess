@@ -5,10 +5,7 @@ import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
-import service.requests.CreateGameRequest;
-import service.requests.JoinGameRequest;
-import service.requests.ListGamesRequest;
-import service.requests.LoginRequest;
+import service.requests.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -114,6 +111,19 @@ public class ServerFacadeTests {
         register();
         var u = new JoinGameRequest("WHiTE", 1, authToken);
         Assertions.assertThrows(DataAccessException.class, () -> facade.join(u));
+    }
+
+    void logout() throws Exception {
+        register();
+        var u = new LogoutRequest(authToken);
+        facade.logout(u);
+    }
+
+    @Test
+    void logoutFalse() throws Exception {
+        register();
+        var u = new LogoutRequest("123");
+        Assertions.assertThrows(DataAccessException.class, () -> facade.logout(u));
     }
 
 }
