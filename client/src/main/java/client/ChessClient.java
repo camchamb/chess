@@ -54,7 +54,8 @@ public class ChessClient {
             case "list" -> list();
             case "join" -> join(params);
             case "observe" -> observe(params);
-            case "quit" -> "quit";
+            case "logout" -> logout();
+            case "quit" -> quit();
             default -> postHelp();
         };
     }
@@ -62,7 +63,7 @@ public class ChessClient {
     public String gameEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
 //            case "register" -> register(params);
-            case "quit" -> "quit";
+            case "quit" -> quit();
             default -> gameHelp();
         };
     }
@@ -100,7 +101,7 @@ public class ChessClient {
         var user = server.addUser(new UserData(username, password, email));
         state = State.PostloginClient;
         authToken = user.authToken();
-        return "Registered:" + user.username();
+        return "Registered: " + user.username();
     }
 
     public String login(String... params) throws DataAccessException {
@@ -128,6 +129,18 @@ public class ChessClient {
         var result = server.list(authToken);
         gameList = result;
         return "Games: " + result;
+    }
+
+    public String logout() throws DataAccessException {
+        server.logout(new LogoutRequest(authToken));
+        state = State.PreloginClient;
+        return "Logged out";
+    }
+
+    public String quit() throws DataAccessException {
+        server.logout(new LogoutRequest(authToken));
+        state = State.PreloginClient;
+        return "quit";
     }
 
     public String join(String... params) throws DataAccessException {
