@@ -98,7 +98,7 @@ public class ChessClient {
         var username = params[0];
         var password = params[1];
         var email = params[2];
-        var user = server.addUser(new UserData(username, password, email));
+        var user = server.register(new UserData(username, password, email));
         state = State.PostloginClient;
         authToken = user.authToken();
         return "Registered: " + user.username();
