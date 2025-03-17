@@ -22,7 +22,7 @@ public class Repl implements NotificationHandler {
             printPrompt();
             String line = scanner.nextLine();
             try {
-                chessClient.eval(line);
+                result = chessClient.eval(line);
                 System.out.println("\n" + result);
             } catch (Throwable e) {
                 var msg = e.toString();
