@@ -17,7 +17,7 @@ public class Repl implements NotificationHandler {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var result = "";
-        System.out.print("\n" + chessClient.eval("help") + "\n");
+        System.out.print("Welcome to the Chess Server." + "\n" + chessClient.eval("help") + "\n");
         while (!result.equals("quit")) {
             printPrompt();
             String line = scanner.nextLine();
