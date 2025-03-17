@@ -86,7 +86,6 @@ public class ServerFacadeTests {
 
     @Test
     void list() throws Exception {
-        register();
         create();
         var data = facade.list(authToken);
         Assertions.assertFalse(data.isEmpty());
@@ -100,7 +99,6 @@ public class ServerFacadeTests {
 
     @Test
     void join() throws Exception {
-        register();
         create();
         var u = new JoinGameRequest("WHITE", gameID, authToken);
         facade.join(u);
@@ -112,7 +110,7 @@ public class ServerFacadeTests {
         var u = new JoinGameRequest("WHiTE", 1, authToken);
         Assertions.assertThrows(DataAccessException.class, () -> facade.join(u));
     }
-    
+
     @Test
     void logout() throws Exception {
         register();
