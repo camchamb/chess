@@ -8,10 +8,12 @@ import server.ServerFacade;
 import dataaccess.DataAccessException;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 public class ChessClient {
     private final NotificationHandler notificationHandler;
     private String authToken = null;
+    private Collection<GameData> gameList = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.PreloginClient;
@@ -51,9 +53,7 @@ public class ChessClient {
             case "create" -> create(params);
             case "list" -> list();
             case "join" -> join(params);
-//                case "signout" -> signOut();
-//                case "adopt" -> adoptPet(params);
-//                case "adoptall" -> adoptAllPets();
+            case "observe" -> observe(params);
             case "quit" -> "quit";
             default -> postHelp();
         };
@@ -61,12 +61,7 @@ public class ChessClient {
 
     public String gameEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
-            case "register" -> register(params);
-//                case "rescue" -> rescuePet(params);
-//                case "list" -> listPets();
-//                case "signout" -> signOut();
-//                case "adopt" -> adoptPet(params);
-//                case "adoptall" -> adoptAllPets();
+//            case "register" -> register(params);
             case "quit" -> "quit";
             default -> gameHelp();
         };
@@ -131,6 +126,7 @@ public class ChessClient {
 
     public String list() throws DataAccessException {
         var result = server.list(authToken);
+        gameList = result;
         return "Games: " + result;
     }
 
@@ -138,11 +134,47 @@ public class ChessClient {
         if (params.length < 2) {
             throw new DataAccessException(400, "Expected: <ID> <COLOR>");
         }
-        var gameID = Integer.parseInt(params[0]);
+        int gameID;
+        try {
+            gameID = Integer.parseInt(params[0]);
+        } catch (Exception e) {
+            throw new DataAccessException(400, "GameID not a number");
+        }
         var color = params[1].toUpperCase();
         server.join(new JoinGameRequest(color, gameID, authToken));
         state = State.GamePlayClient;
         return "Joined game: " + gameID;
+    }
+
+    public String observe(String... params) throws DataAccessException {
+        if (params.length < 1) {
+            throw new DataAccessException(400, "Expected: <ID>");
+        }
+        int gameID;
+        try {
+            gameID = Integer.parseInt(params[0]);
+        } catch (Exception e) {
+            throw new DataAccessException(400, "GameID not a number");
+        }
+        GameData obs_game = null;
+        for (var game : gameList) {
+            if (game.gameID() == gameID) {
+                obs_game = game;
+            }
+        }
+        if (obs_game == null) {
+            return "No game with that ID";
+        }
+        state = State.GamePlayClient;
+        return obs_game.toString();
+    }
+
+    public String printPrompt() {
+        return switch (state) {
+            case PreloginClient -> "Logged Out";
+            case PostloginClient -> "Logged In";
+            case GamePlayClient -> "GamePlay";
+        };
     }
 
 }
