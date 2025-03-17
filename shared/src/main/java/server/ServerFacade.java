@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import model.*;
 import service.requests.*;
 
@@ -15,29 +16,34 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData addUser(UserData u) {
+    public UserData addUser(UserData u) throws DataAccessException {
         var path = "/user";
-        return makeRequest("POST", path, u, UserData.class);
+        return makeRequest("POST", path, u, UserData.class, null);
     }
 
-    public LoginResult login(UserData u) {
+    public LoginResult login(UserData u) throws DataAccessException {
         var path = "/session";
-        return makeRequest("POST", path, u, LoginResult.class);
+        return makeRequest("POST", path, u, LoginResult.class, null);
     }
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass) {
+    public CreateGameResult create(CreateGameRequest req) throws DataAccessException {
+        var path = "/game";
+        return makeRequest("POST", path, req, CreateGameResult.class, req.authToken());
+    }
+
+    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
-            writeBody(request, http);
+            writeBody(request, http, authToken);
             http.connect();
-//            throwIfNotSuccessful(http);
+            throwIfNotSuccessful(http);
             return readBody(http, objectClass);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new DataAccessException(400, e.getMessage());
         }
     }
 
@@ -54,13 +60,31 @@ public class ServerFacade {
         return response;
     }
 
-    private static void writeBody(Object request, HttpURLConnection http) throws IOException {
+    private static void writeBody(Object request, HttpURLConnection http, String authToken) throws IOException {
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
+            http.setRequestProperty ("Authorization", authToken);
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
             }
         }
+    }
+
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
+        var status = http.getResponseCode();
+        if (!isSuccessful(status)) {
+            try (InputStream respErr = http.getErrorStream()) {
+                if (respErr != null) {
+                    throw DataAccessException.fromJson(respErr);
+                }
+            }
+
+            throw new DataAccessException(status, "other failure: " + status);
+        }
+    }
+
+    private boolean isSuccessful(int status) {
+        return status / 100 == 2;
     }
 }
