@@ -42,6 +42,11 @@ public class ServerFacade {
         makeRequest("PUT", path, req, null, req.authToken());
     }
 
+    public void logout(LogoutRequest req) throws DataAccessException {
+        var path = "/session";
+        makeRequest("DELETE", path, req, null, req.authToken());
+    }
+
     public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
