@@ -7,6 +7,7 @@ import service.requests.*;
 
 import java.io.*;
 import java.net.*;
+import java.util.Collection;
 
 public class ServerFacade {
 
@@ -16,9 +17,9 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public UserData addUser(UserData u) throws DataAccessException {
+    public RegisterResult addUser(UserData u) throws DataAccessException {
         var path = "/user";
-        return makeRequest("POST", path, u, UserData.class, null);
+        return makeRequest("POST", path, u, RegisterResult.class, null);
     }
 
     public LoginResult login(UserData u) throws DataAccessException {
@@ -29,6 +30,11 @@ public class ServerFacade {
     public CreateGameResult create(CreateGameRequest req) throws DataAccessException {
         var path = "/game";
         return makeRequest("POST", path, req, CreateGameResult.class, req.authToken());
+    }
+
+    public Collection<GameData> list(String authToken) throws DataAccessException {
+        var path = "/game";
+        return makeRequest("GET", path, null, ListGamesResult.class, authToken).games();
     }
 
     public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
@@ -61,9 +67,9 @@ public class ServerFacade {
     }
 
     private static void writeBody(Object request, HttpURLConnection http, String authToken) throws IOException {
+        http.setRequestProperty ("authorization", authToken);
         if (request != null) {
             http.addRequestProperty("Content-Type", "application/json");
-            http.setRequestProperty ("Authorization", authToken);
             String reqData = new Gson().toJson(request);
             try (OutputStream reqBody = http.getOutputStream()) {
                 reqBody.write(reqData.getBytes());
