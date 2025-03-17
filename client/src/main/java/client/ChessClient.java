@@ -7,14 +7,14 @@ import dataaccess.DataAccessException;
 
 import java.util.Arrays;
 
-public class PreloginClient {
+public class ChessClient {
     private final NotificationHandler notificationHandler;
     private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.PreloginClient;
 
-    public PreloginClient(String serverUrl, NotificationHandler notificationHandler) {
+    public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.notificationHandler = notificationHandler;
