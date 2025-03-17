@@ -37,6 +37,11 @@ public class ServerFacade {
         return makeRequest("GET", path, null, ListGamesResult.class, authToken).games();
     }
 
+    public void join(JoinGameRequest req) throws DataAccessException {
+        var path = "/game";
+        makeRequest("PUT", path, req, null, req.authToken());
+    }
+
     public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
