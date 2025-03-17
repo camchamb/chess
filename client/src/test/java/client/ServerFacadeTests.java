@@ -112,7 +112,8 @@ public class ServerFacadeTests {
         var u = new JoinGameRequest("WHiTE", 1, authToken);
         Assertions.assertThrows(DataAccessException.class, () -> facade.join(u));
     }
-
+    
+    @Test
     void logout() throws Exception {
         register();
         var u = new LogoutRequest(authToken);
