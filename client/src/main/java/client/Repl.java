@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 public class Repl implements NotificationHandler {
     private final ChessClient chessClient;
-    public State state = State.PreloginClient;
 
     public Repl(String serverUrl) {
         chessClient = new ChessClient(serverUrl, this);
@@ -33,7 +32,8 @@ public class Repl implements NotificationHandler {
     }
 
     public void printPrompt() {
-        System.out.print("\n" + "ChessClient >>> ");
+        var prompt = chessClient.printPrompt();
+        System.out.print("\n" + prompt + " >>> ");
     }
 
     @Override
