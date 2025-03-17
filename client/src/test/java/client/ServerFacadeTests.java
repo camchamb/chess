@@ -34,12 +34,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        assertTrue(true);
-    }
-
     @Test
     void register() throws Exception {
         var u = new UserData("player1", "password", "p1@email.com");
