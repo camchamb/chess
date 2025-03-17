@@ -1,6 +1,8 @@
 package client;
 
 import com.sun.nio.sctp.NotificationHandler;
+import model.GameData;
+import service.requests.*;
 import model.UserData;
 import server.ServerFacade;
 import dataaccess.DataAccessException;
@@ -39,10 +41,6 @@ public class ChessClient {
         return switch (cmd) {
             case "register" -> register(params);
             case "login" -> login(params);
-//                case "list" -> listPets();
-//                case "signout" -> signOut();
-//                case "adopt" -> adoptPet(params);
-//                case "adoptall" -> adoptAllPets();
             case "quit" -> "quit";
             default -> preHelp();
         };
@@ -50,7 +48,7 @@ public class ChessClient {
 
     public String postEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
-            case "register" -> register(params);
+            case "create" -> create(params);
 //                case "rescue" -> rescuePet(params);
 //                case "list" -> listPets();
 //                case "signout" -> signOut();
@@ -119,6 +117,15 @@ public class ChessClient {
         state = State.PostloginClient;
         authToken = user.authToken();
         return "Logged in: " + user.username();
+    }
+
+    public String create(String... params) throws DataAccessException {
+        if (params.length < 1) {
+            throw new DataAccessException(400, "Expected: <username> <password>");
+        }
+        var gameName = params[0];
+        var gameResult = server.create(new CreateGameRequest(gameName, authToken));
+        return "Created game: " + gameResult.gameID();
     }
 
 }
