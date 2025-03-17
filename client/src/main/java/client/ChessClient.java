@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class ChessClient {
     private final NotificationHandler notificationHandler;
-    private String visitorName = null;
+    private String authToken = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.PreloginClient;
@@ -38,7 +38,7 @@ public class ChessClient {
     public String preEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
             case "register" -> register(params);
-//                case "rescue" -> rescuePet(params);
+            case "login" -> login(params);
 //                case "list" -> listPets();
 //                case "signout" -> signOut();
 //                case "adopt" -> adoptPet(params);
@@ -108,4 +108,17 @@ public class ChessClient {
         state = State.PostloginClient;
         return "Registered:" + user.username();
     }
+
+    public String login(String... params) throws DataAccessException {
+        if (params.length < 2) {
+            throw new DataAccessException(400, "Expected: <username> <password>");
+        }
+        var username = params[0];
+        var password = params[1];
+        var user = server.login(new UserData(username, password, null));
+        state = State.PostloginClient;
+        authToken = user.authToken();
+        return "Logged in: " + user.username();
+    }
+
 }
