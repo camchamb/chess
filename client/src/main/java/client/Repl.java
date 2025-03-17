@@ -3,6 +3,7 @@ package client;
 import com.sun.nio.sctp.HandlerResult;
 import com.sun.nio.sctp.Notification;
 import com.sun.nio.sctp.NotificationHandler;
+import dataaccess.DataAccessException;
 
 import java.util.Scanner;
 
@@ -25,7 +26,7 @@ public class Repl implements NotificationHandler {
                 result = chessClient.eval(line);
                 System.out.println("\n" + result);
             } catch (Throwable e) {
-                var msg = e.toString();
+                var msg = e.getMessage();
                 System.out.print(msg);
             }
         }
