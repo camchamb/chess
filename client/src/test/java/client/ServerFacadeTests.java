@@ -6,6 +6,7 @@ import org.junit.jupiter.api.*;
 import server.Server;
 import server.ServerFacade;
 import service.requests.CreateGameRequest;
+import service.requests.JoinGameRequest;
 import service.requests.ListGamesRequest;
 import service.requests.LoginRequest;
 
@@ -17,6 +18,7 @@ public class ServerFacadeTests {
     private static Server server;
     private static ServerFacade facade = new ServerFacade("http://localhost:8080");
     private String authToken;
+    private Integer gameID;
 
     @BeforeAll
     public static void init() {
@@ -75,7 +77,7 @@ public class ServerFacadeTests {
         register();
         var u = new CreateGameRequest("Name", authToken);
         var data = facade.create(u);
-        data.gameID();
+        gameID = data.gameID();
     }
 
     @Test
@@ -100,17 +102,18 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void list() throws Exception {
+    void join() throws Exception {
         register();
         create();
-        var data = facade.list(authToken);
-        Assertions.assertFalse(data.isEmpty());
+        var u = new JoinGameRequest("WHITE", gameID, authToken);
+        facade.join(u);
     }
 
     @Test
-    void listFalse() throws Exception {
+    void joinFalse() throws Exception {
         register();
-        Assertions.assertThrows(DataAccessException.class, () -> facade.list("1234"));
+        var u = new JoinGameRequest("WHiTE", 1, authToken);
+        Assertions.assertThrows(DataAccessException.class, () -> facade.join(u));
     }
 
 }
