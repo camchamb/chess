@@ -17,7 +17,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult addUser(UserData u) throws DataAccessException {
+    public RegisterResult register(UserData u) throws DataAccessException {
         var path = "/user";
         return makeRequest("POST", path, u, RegisterResult.class, null);
     }
@@ -45,6 +45,12 @@ public class ServerFacade {
     public void logout(LogoutRequest req) throws DataAccessException {
         var path = "/session";
         makeRequest("DELETE", path, req, null, req.authToken());
+    }
+
+    public void clear() throws DataAccessException {
+        var path = "/db";
+        var req = new LogoutRequest(null);
+        makeRequest("DELETE", path, req, null, null);
     }
 
     public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
