@@ -49,7 +49,7 @@ public class ChessClient {
     public String postEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
             case "create" -> create(params);
-//                case "rescue" -> rescuePet(params);
+            case "list" -> list();
 //                case "list" -> listPets();
 //                case "signout" -> signOut();
 //                case "adopt" -> adoptPet(params);
@@ -104,6 +104,7 @@ public class ChessClient {
         var email = params[2];
         var user = server.addUser(new UserData(username, password, email));
         state = State.PostloginClient;
+        authToken = user.authToken();
         return "Registered:" + user.username();
     }
 
@@ -127,5 +128,12 @@ public class ChessClient {
         var gameResult = server.create(new CreateGameRequest(gameName, authToken));
         return "Created game: " + gameResult.gameID();
     }
+
+    public String list() throws DataAccessException {
+        var result = server.list(authToken);
+        return "Games: " + result;
+    }
+
+
 
 }
