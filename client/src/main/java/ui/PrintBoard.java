@@ -72,9 +72,6 @@ public class PrintBoard {
     }
 
         private static void drawHeader(PrintStream out, String headerText) {
-            int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-            int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
-
             out.print(EMPTY.repeat(0));
             printHeaderText(out, headerText);
             out.print(EMPTY.repeat(0));
