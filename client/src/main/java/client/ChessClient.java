@@ -207,12 +207,12 @@ public class ChessClient {
         } else {
             PrintBoard.printBoard(ChessGame.TeamColor.BLACK);
         }
-        return "\n";
+        return "";
     }
 
     public String exit() {
         state = State.PostloginClient;
-        return "\n";
+        return "";
     }
 
 }
