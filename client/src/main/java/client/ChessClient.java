@@ -1,11 +1,13 @@
 package client;
 
+import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import model.GameData;
 import service.requests.*;
 import model.UserData;
 import server.ServerFacade;
 import dataaccess.DataAccessException;
+import ui.PrintBoard;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,6 +19,7 @@ public class ChessClient {
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.PreloginClient;
+    private ChessGame.TeamColor playersColor = null;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -62,9 +65,10 @@ public class ChessClient {
 
     public String gameEval(String[] params, String cmd) throws DataAccessException{
         return switch (cmd) {
-//            case "register" -> register(params);
+            case "help" -> gameHelp();
             case "quit" -> quit();
-            default -> gameHelp();
+            case "exit" -> exit();
+            default -> printBoard();
         };
     }
 
@@ -156,6 +160,12 @@ public class ChessClient {
         var color = params[1].toUpperCase();
         server.join(new JoinGameRequest(color, gameID, authToken));
         state = State.GamePlayClient;
+        if (color.equals("WHITE")) {
+            playersColor = ChessGame.TeamColor.WHITE;
+        } else {
+            playersColor = ChessGame.TeamColor.BLACK;
+        }
+
         return "Joined game: " + gameID;
     }
 
@@ -179,6 +189,7 @@ public class ChessClient {
             return "No game with that ID";
         }
         state = State.GamePlayClient;
+        playersColor = ChessGame.TeamColor.BLACK;
         return obs_game.toString();
     }
 
@@ -188,6 +199,20 @@ public class ChessClient {
             case PostloginClient -> "Logged In";
             case GamePlayClient -> "GamePlay";
         };
+    }
+
+    public String printBoard() {
+        if (playersColor.equals(ChessGame.TeamColor.WHITE)) {
+            PrintBoard.printBoard(ChessGame.TeamColor.WHITE);
+        } else {
+            PrintBoard.printBoard(ChessGame.TeamColor.BLACK);
+        }
+        return "\n";
+    }
+
+    public String exit() {
+        state = State.PostloginClient;
+        return "\n";
     }
 
 }
