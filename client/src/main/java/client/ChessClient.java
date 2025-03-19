@@ -4,7 +4,7 @@ import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import model.GameData;
 import serverfacade.ServerFacade;
-import service.requests.*;
+import requests.*;
 import model.UserData;
 import ui.PrintBoard;
 import java.util.ArrayList;

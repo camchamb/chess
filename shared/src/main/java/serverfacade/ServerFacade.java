@@ -3,7 +3,7 @@ package serverfacade;
 import chess.ResponseException;
 import com.google.gson.Gson;
 import model.*;
-import service.requests.*;
+import requests.*;
 
 import java.io.*;
 import java.net.*;
