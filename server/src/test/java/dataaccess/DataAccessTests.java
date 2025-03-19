@@ -5,14 +5,8 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
-import passoff.server.TestServerFacade;
-import server.Server;
-import service.GameService;
-import service.UserService;
-import service.requests.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class DataAccessTests {
     private static final UserDAO USER_ACCESS;

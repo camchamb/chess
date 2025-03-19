@@ -3,15 +3,14 @@ package client;
 import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import model.GameData;
+import serverfacade.ServerFacade;
 import service.requests.*;
 import model.UserData;
-import server.ServerFacade;
 import dataaccess.DataAccessException;
 import ui.PrintBoard;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 public class ChessClient {
     private final NotificationHandler notificationHandler;

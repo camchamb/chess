@@ -3,7 +3,6 @@ package client;
 import com.sun.nio.sctp.HandlerResult;
 import com.sun.nio.sctp.Notification;
 import com.sun.nio.sctp.NotificationHandler;
-import dataaccess.DataAccessException;
 
 import java.util.Scanner;
 
