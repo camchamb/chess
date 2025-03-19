@@ -9,13 +9,14 @@ import server.ServerFacade;
 import dataaccess.DataAccessException;
 import ui.PrintBoard;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 public class ChessClient {
     private final NotificationHandler notificationHandler;
     private String authToken = null;
-    private Collection<GameData> gameList = null;
+    private ArrayList<GameData> gameList = null;
     private final ServerFacade server;
     private final String serverUrl;
     private State state = State.PreloginClient;
@@ -105,7 +106,7 @@ public class ChessClient {
         var user = server.register(new UserData(username, password, email));
         state = State.PostloginClient;
         authToken = user.authToken();
-        return "Registered: " + user.username();
+        return postHelp();
     }
 
     public String login(String... params) throws DataAccessException {
@@ -117,7 +118,7 @@ public class ChessClient {
         var user = server.login(new UserData(username, password, null));
         state = State.PostloginClient;
         authToken = user.authToken();
-        return "Logged in: " + user.username();
+        return postHelp();
     }
 
     public String create(String... params) throws DataAccessException {
@@ -125,17 +126,21 @@ public class ChessClient {
             throw new DataAccessException(400, "Expected: <username> <password>");
         }
         var gameName = params[0];
-        var gameResult = server.create(new CreateGameRequest(gameName, authToken));
-        return "Created game: " + gameResult.gameID();
+        server.create(new CreateGameRequest(gameName, authToken));
+        return "Created game: " + gameName;
     }
 
     public String list() throws DataAccessException {
         var result = server.list(authToken);
-        gameList = result;
-        StringBuilder games = new StringBuilder("Games:\n");
+        gameList = (ArrayList<GameData>) result;
+        StringBuilder games = new StringBuilder();
+        int i = 1;
         for (var game : result) {
+            games.append("Game ");
+            games.append(i).append(":\n");
             games.append(game.toString());
             games.append("\n");
+            i++;
         }
         return games.toString();
     }
@@ -162,16 +167,19 @@ public class ChessClient {
         } catch (Exception e) {
             throw new DataAccessException(400, "GameID not a number");
         }
+        if (gameID < 1 || gameID > gameList.size()) {
+            throw new DataAccessException(400, "GameID not valid");
+        }
         var color = params[1].toUpperCase();
-        server.join(new JoinGameRequest(color, gameID, authToken));
+        int realGameId = gameList.get(gameID - 1).gameID();
+        server.join(new JoinGameRequest(color, realGameId, authToken));
         state = State.GamePlayClient;
         if (color.equals("WHITE")) {
             playersColor = ChessGame.TeamColor.WHITE;
         } else {
             playersColor = ChessGame.TeamColor.BLACK;
         }
-
-        return "Joined game: " + gameID;
+        return printBoard();
     }
 
     public String observe(String... params) throws DataAccessException {
@@ -184,18 +192,14 @@ public class ChessClient {
         } catch (Exception e) {
             throw new DataAccessException(400, "GameID not a number");
         }
-        GameData obs_game = null;
-        for (var game : gameList) {
-            if (game.gameID() == gameID) {
-                obs_game = game;
-            }
+        if (gameID < 1 || gameID > gameList.size()) {
+            throw new DataAccessException(400, "GameID not valid");
         }
-        if (obs_game == null) {
-            return "No game with that ID";
-        }
+        GameData obs_game = gameList.get(gameID - 1);
+
         state = State.GamePlayClient;
-        playersColor = ChessGame.TeamColor.BLACK;
-        return obs_game.toString();
+        playersColor = ChessGame.TeamColor.WHITE;
+        return printBoard();
     }
 
     public String printPrompt() {
