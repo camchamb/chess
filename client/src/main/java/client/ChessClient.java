@@ -6,7 +6,6 @@ import model.GameData;
 import serverfacade.ServerFacade;
 import service.requests.*;
 import model.UserData;
-import dataaccess.DataAccessException;
 import ui.PrintBoard;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,12 +35,12 @@ public class ChessClient {
                 case PostloginClient -> postEval(params, cmd);
                 case GamePlayClient -> gameEval(params, cmd);
             };
-        } catch (DataAccessException ex) {
+        } catch (RuntimeException ex) {
             return ex.getMessage();
         }
     }
 
-    public String preEval(String[] params, String cmd) throws DataAccessException{
+    public String preEval(String[] params, String cmd) throws RuntimeException{
         return switch (cmd) {
             case "register" -> register(params);
             case "login" -> login(params);
@@ -50,7 +49,7 @@ public class ChessClient {
         };
     }
 
-    public String postEval(String[] params, String cmd) throws DataAccessException{
+    public String postEval(String[] params, String cmd) throws RuntimeException{
         return switch (cmd) {
             case "create" -> create(params);
             case "list" -> list();
@@ -62,7 +61,7 @@ public class ChessClient {
         };
     }
 
-    public String gameEval(String[] params, String cmd) throws DataAccessException{
+    public String gameEval(String[] params, String cmd) throws RuntimeException{
         return switch (cmd) {
             case "help" -> gameHelp();
             case "quit" -> quit();
@@ -94,9 +93,9 @@ public class ChessClient {
                 quit - stop client
                 help - all commands""";}
 
-    public String register(String... params) throws DataAccessException {
+    public String register(String... params) throws RuntimeException {
         if (params.length < 3) {
-            throw new DataAccessException(400, "Expected: <username> <password> <email>");
+            throw new RuntimeException("Expected: <username> <password> <email>");
         }
         var username = params[0];
         var password = params[1];
@@ -107,9 +106,9 @@ public class ChessClient {
         return postHelp();
     }
 
-    public String login(String... params) throws DataAccessException {
+    public String login(String... params) throws RuntimeException {
         if (params.length < 2) {
-            throw new DataAccessException(400, "Expected: <username> <password>");
+            throw new RuntimeException("Expected: <username> <password>");
         }
         var username = params[0];
         var password = params[1];
@@ -119,16 +118,16 @@ public class ChessClient {
         return postHelp();
     }
 
-    public String create(String... params) throws DataAccessException {
+    public String create(String... params) throws RuntimeException {
         if (params.length < 1) {
-            throw new DataAccessException(400, "Expected: <username> <password>");
+            throw new RuntimeException("Expected: <username> <password>");
         }
         var gameName = params[0];
         server.create(new CreateGameRequest(gameName, authToken));
         return "Created game: " + gameName;
     }
 
-    public String list() throws DataAccessException {
+    public String list() throws RuntimeException {
         var result = server.list(authToken);
         gameList = (ArrayList<GameData>) result;
         StringBuilder games = new StringBuilder();
@@ -143,30 +142,30 @@ public class ChessClient {
         return games.toString();
     }
 
-    public String logout() throws DataAccessException {
+    public String logout() throws RuntimeException {
         server.logout(new LogoutRequest(authToken));
         state = State.PreloginClient;
         return "Logged out";
     }
 
-    public String quit() throws DataAccessException {
+    public String quit() throws RuntimeException {
         server.logout(new LogoutRequest(authToken));
         state = State.PreloginClient;
         return "quit";
     }
 
-    public String join(String... params) throws DataAccessException {
+    public String join(String... params) throws RuntimeException {
         if (params.length < 2) {
-            throw new DataAccessException(400, "Expected: <ID> <COLOR>");
+            throw new RuntimeException("Expected: <ID> <COLOR>");
         }
         int gameID;
         try {
             gameID = Integer.parseInt(params[0]);
         } catch (Exception e) {
-            throw new DataAccessException(400, "GameID not a number");
+            throw new RuntimeException("GameID not a number");
         }
         if (gameID < 1 || gameID > gameList.size()) {
-            throw new DataAccessException(400, "GameID not valid");
+            throw new RuntimeException("GameID not valid");
         }
         var color = params[1].toUpperCase();
         int realGameId = gameList.get(gameID - 1).gameID();
@@ -180,18 +179,18 @@ public class ChessClient {
         return printBoard();
     }
 
-    public String observe(String... params) throws DataAccessException {
+    public String observe(String... params) throws RuntimeException {
         if (params.length < 1) {
-            throw new DataAccessException(400, "Expected: <ID>");
+            throw new RuntimeException("Expected: <ID>");
         }
         int gameID;
         try {
             gameID = Integer.parseInt(params[0]);
         } catch (Exception e) {
-            throw new DataAccessException(400, "GameID not a number");
+            throw new RuntimeException("GameID not a number");
         }
         if (gameID < 1 || gameID > gameList.size()) {
-            throw new DataAccessException(400, "GameID not valid");
+            throw new RuntimeException("GameID not valid");
         }
         GameData obs_game = gameList.get(gameID - 1);
 

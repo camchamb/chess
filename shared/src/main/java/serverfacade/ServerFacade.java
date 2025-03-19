@@ -17,43 +17,43 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult register(UserData u) throws DataAccessException {
+    public RegisterResult register(UserData u) throws RuntimeException {
         var path = "/user";
         return makeRequest("POST", path, u, RegisterResult.class, null);
     }
 
-    public LoginResult login(UserData u) throws DataAccessException {
+    public LoginResult login(UserData u) throws RuntimeException {
         var path = "/session";
         return makeRequest("POST", path, u, LoginResult.class, null);
     }
 
-    public CreateGameResult create(CreateGameRequest req) throws DataAccessException {
+    public CreateGameResult create(CreateGameRequest req) throws RuntimeException {
         var path = "/game";
         return makeRequest("POST", path, req, CreateGameResult.class, req.authToken());
     }
 
-    public Collection<GameData> list(String authToken) throws DataAccessException {
+    public Collection<GameData> list(String authToken) throws RuntimeException {
         var path = "/game";
         return makeRequest("GET", path, null, ListGamesResult.class, authToken).games();
     }
 
-    public void join(JoinGameRequest req) throws DataAccessException {
+    public void join(JoinGameRequest req) throws RuntimeException {
         var path = "/game";
         makeRequest("PUT", path, req, null, req.authToken());
     }
 
-    public void logout(LogoutRequest req) throws DataAccessException {
+    public void logout(LogoutRequest req) throws RuntimeException {
         var path = "/session";
         makeRequest("DELETE", path, req, null, req.authToken());
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws RuntimeException {
         var path = "/db";
         var req = new LogoutRequest(null);
         makeRequest("DELETE", path, req, null, null);
     }
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws DataAccessException {
+    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws RuntimeException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -65,7 +65,7 @@ public class ServerFacade {
             throwIfNotSuccessful(http);
             return readBody(http, objectClass);
         } catch (Exception e) {
-            throw new DataAccessException(400, e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
@@ -93,16 +93,20 @@ public class ServerFacade {
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, RuntimeException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw DataAccessException.fromJson(respErr);
+                    try {
+                        throw DataAccessException.fromJson(respErr);
+                    } catch (DataAccessException e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
                 }
             }
 
-            throw new DataAccessException(status, "other failure: " + status);
+            throw new RuntimeException("other failure: " + status);
         }
     }
 
