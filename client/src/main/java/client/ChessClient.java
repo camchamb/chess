@@ -132,7 +132,12 @@ public class ChessClient {
     public String list() throws DataAccessException {
         var result = server.list(authToken);
         gameList = result;
-        return "Games: " + result;
+        StringBuilder games = new StringBuilder("Games:\n");
+        for (var game : result) {
+            games.append(game.toString());
+            games.append("\n");
+        }
+        return games.toString();
     }
 
     public String logout() throws DataAccessException {
