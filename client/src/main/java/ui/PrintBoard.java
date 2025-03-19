@@ -14,13 +14,8 @@ public class PrintBoard {
 
         // Board dimensions.
         private static final int BOARD_SIZE_IN_SQUARES = 8;
-        private static final int SQUARE_SIZE_IN_PADDED_CHARS = 1;
-        private static final int LINE_WIDTH_IN_PADDED_CHARS = 0;
-
-        // Padded characters.
 
         private static ChessBoard board;
-
 
         public static void printBoard(ChessGame.TeamColor color) {
             var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
@@ -47,34 +42,23 @@ public class PrintBoard {
             String[] headers = { " h ", "  g ", "  f ", " e ", "  d ", " c ", "  b " , " a "};
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 drawHeader(out, headers[boardCol]);
-
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-                }
             }
 
             out.println();
         }
 
     private static void drawWhiteHeader(PrintStream out) {
-
         setBlack(out);
         String[] headers = { " a ", "  b ", "  c ", " d ", "  e ", " f ", "  g " , " h "};
         for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
             drawHeader(out, headers[boardCol]);
-
-            if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
-            }
         }
 
         out.println();
     }
 
         private static void drawHeader(PrintStream out, String headerText) {
-            out.print(EMPTY.repeat(0));
             printHeaderText(out, headerText);
-            out.print(EMPTY.repeat(0));
         }
 
         private static void printHeaderText(PrintStream out, String player) {
