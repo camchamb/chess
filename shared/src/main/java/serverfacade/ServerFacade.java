@@ -1,7 +1,7 @@
 package serverfacade;
 
+import chess.ResponseException;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
 import model.*;
 import service.requests.*;
 
@@ -99,8 +99,8 @@ public class ServerFacade {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
                     try {
-                        throw DataAccessException.fromJson(respErr);
-                    } catch (DataAccessException e) {
+                        throw ResponseException.fromJson(respErr);
+                    } catch (ResponseException e) {
                         throw new RuntimeException(e.getMessage());
                     }
                 }
