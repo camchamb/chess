@@ -17,43 +17,43 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult register(UserData u) throws RuntimeException {
+    public RegisterResult register(UserData u) {
         var path = "/user";
         return makeRequest("POST", path, u, RegisterResult.class, null);
     }
 
-    public LoginResult login(UserData u) throws RuntimeException {
+    public LoginResult login(UserData u) {
         var path = "/session";
         return makeRequest("POST", path, u, LoginResult.class, null);
     }
 
-    public CreateGameResult create(CreateGameRequest req) throws RuntimeException {
+    public CreateGameResult create(CreateGameRequest req) {
         var path = "/game";
         return makeRequest("POST", path, req, CreateGameResult.class, req.authToken());
     }
 
-    public Collection<GameData> list(String authToken) throws RuntimeException {
+    public Collection<GameData> list(String authToken) {
         var path = "/game";
         return makeRequest("GET", path, null, ListGamesResult.class, authToken).games();
     }
 
-    public void join(JoinGameRequest req) throws RuntimeException {
+    public void join(JoinGameRequest req) {
         var path = "/game";
         makeRequest("PUT", path, req, null, req.authToken());
     }
 
-    public void logout(LogoutRequest req) throws RuntimeException {
+    public void logout(LogoutRequest req) {
         var path = "/session";
         makeRequest("DELETE", path, req, null, req.authToken());
     }
 
-    public void clear() throws RuntimeException {
+    public void clear() {
         var path = "/db";
         var req = new LogoutRequest(null);
         makeRequest("DELETE", path, req, null, null);
     }
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) throws RuntimeException {
+    public <T> T makeRequest(String method, String path, Object request, Class<T> objectClass, String authToken) {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
