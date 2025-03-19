@@ -8,7 +8,6 @@ public record GameData(int gameID, String whiteUsername, String blackUsername, S
         String white = (whiteUsername != null) ? whiteUsername : "Open";
         String black = (blackUsername != null) ? blackUsername : "Open";
         return gameName + "\n" +
-                "ID: " + gameID + "\n" +
                 "White Player: " + white + "\n" +
                 "Black Player: " + black + "\n";
     }
