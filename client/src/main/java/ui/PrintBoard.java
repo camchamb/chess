@@ -32,7 +32,7 @@ public class PrintBoard {
             if (color == ChessGame.TeamColor.WHITE) {
                 drawWhiteBoard(out);
             } else {
-            drawBlackBoard(out);
+                drawBlackBoard(out);
             }
             out.println();
 
@@ -117,7 +117,7 @@ public class PrintBoard {
         for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
             for (int boardCol = 8; boardCol > 0; --boardCol) {
 
-                if ((boardRow + boardCol) % 2 == 0) {
+                if ((boardRow + boardCol) % 2 != 0) {
                     printWhiteSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
                 } else {
                     printBlackSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
