@@ -1,6 +1,5 @@
 package client;
 
-import dataaccess.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -13,19 +12,20 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ServerFacadeTests {
 
     private static Server server;
-    private static ServerFacade facade = new ServerFacade("http://localhost:8080");
+    private static ServerFacade facade;
     private String authToken;
     private Integer gameID;
 
     @BeforeAll
     public static void init() {
         server = new Server();
-        var port = server.run(8080);
+        var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade("http://localhost:" + port);
     }
 
     @BeforeEach
-    public void clear() throws DataAccessException {
+    public void clear() throws RuntimeException {
         facade.clear();
     }
 
@@ -46,7 +46,7 @@ public class ServerFacadeTests {
     void registerFalse() throws Exception {
         register();
         var u = new UserData("player1", "password", "p1@email.com");
-        Assertions.assertThrows(DataAccessException.class, () -> facade.register(u));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.register(u));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ServerFacadeTests {
     @Test
     void loginFalse() throws Exception {
         var u = new UserData("player1", "password", null);
-        Assertions.assertThrows(DataAccessException.class, () -> facade.login(u));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.login(u));
     }
 
     @Test
@@ -75,7 +75,7 @@ public class ServerFacadeTests {
     void createFalse() throws Exception {
         register();
         var u = new CreateGameRequest("Name", "1234");
-        Assertions.assertThrows(DataAccessException.class, () -> facade.create(u));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.create(u));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ServerFacadeTests {
     @Test
     void listFalse() throws Exception {
         register();
-        Assertions.assertThrows(DataAccessException.class, () -> facade.list("1234"));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.list("1234"));
     }
 
     @Test
@@ -102,7 +102,7 @@ public class ServerFacadeTests {
     void joinFalse() throws Exception {
         register();
         var u = new JoinGameRequest("WHiTE", 1, authToken);
-        Assertions.assertThrows(DataAccessException.class, () -> facade.join(u));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.join(u));
     }
 
     @Test
@@ -116,7 +116,7 @@ public class ServerFacadeTests {
     void logoutFalse() throws Exception {
         register();
         var u = new LogoutRequest("123");
-        Assertions.assertThrows(DataAccessException.class, () -> facade.logout(u));
+        Assertions.assertThrows(RuntimeException.class, () -> facade.logout(u));
     }
 
 }
