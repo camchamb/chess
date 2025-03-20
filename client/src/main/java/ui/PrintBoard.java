@@ -77,45 +77,44 @@ public class PrintBoard {
 
         for (int boardRow = 8; boardRow > 0; --boardRow) {
             for (int boardCol = 1; boardCol <= 8; ++boardCol) {
-
-                if ((boardRow + boardCol) % 2 != 0) {
-                    printWhiteSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
-                } else {
-                    printBlackSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
-                }
+                drawBoard(out, boardRow, boardCol);
             }
-            out.print(SET_BG_COLOR_BLACK);
-            out.print(SET_TEXT_COLOR_GREEN);
-
-            out.print(rows[boardRow - 1]);
-
-            setBlack(out);
-            out.println();
+            drawRowLabel(out, boardRow);
         }
     }
 
     private static void drawBlackBoard(PrintStream out) {
         drawBlackHeader(out);
-        String[] rows = { " 1", " 2", " 3", " 4", " 5", " 6", " 7" , " 8"};
 
         for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
             for (int boardCol = 8; boardCol > 0; --boardCol) {
 
-                if ((boardRow + boardCol) % 2 != 0) {
-                    printWhiteSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
-                } else {
-                    printBlackSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
-                }
+                drawBoard(out, boardRow, boardCol);
             }
-            out.print(SET_BG_COLOR_BLACK);
-            out.print(SET_TEXT_COLOR_GREEN);
-
-            out.print(rows[boardRow - 1]);
-
-            setBlack(out);
-            out.println();
+            drawRowLabel(out, boardRow);
         }
     }
+
+    private static void drawBoard(PrintStream out, int boardRow, int boardCol) {
+        if ((boardRow + boardCol) % 2 != 0) {
+            printWhiteSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
+        } else {
+            printBlackSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
+        }
+    }
+
+    private static void drawRowLabel(PrintStream out, int boardRow) {
+        String[] rows = { " 1", " 2", " 3", " 4", " 5", " 6", " 7" , " 8"};
+
+        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_TEXT_COLOR_GREEN);
+
+        out.print(rows[boardRow - 1]);
+
+        setBlack(out);
+        out.println();
+    }
+
 
     private static void setWhite(PrintStream out) {
         out.print(SET_BG_COLOR_WHITE);

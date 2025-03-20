@@ -192,7 +192,7 @@ public class ChessClient {
         if (gameID < 1 || gameID > gameList.size()) {
             throw new RuntimeException("GameID not valid");
         }
-        GameData obs_game = gameList.get(gameID - 1);
+        GameData obsGame = gameList.get(gameID - 1);
 
         state = State.GamePlayClient;
         playersColor = ChessGame.TeamColor.WHITE;
