@@ -2,7 +2,9 @@ package client;
 
 import chess.ChessGame;
 //import com.sun.nio.sctp.NotificationHandler;
+import chess.ResponseException;
 import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
 import model.GameData;
 import serverfacade.ServerFacade;
 import requests.*;
@@ -19,6 +21,7 @@ public class ChessClient {
     private final String serverUrl;
     private State state = State.PreloginClient;
     private ChessGame.TeamColor playersColor = null;
+    private WebSocketFacade ws;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -241,5 +244,12 @@ public class ChessClient {
     public String move(String... params) {
         return "Not Finished";
     }
+
+    private void newWebSocket() {
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+    }
+
+
+
 
 }
