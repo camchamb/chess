@@ -1,8 +1,10 @@
 package client;
 
 import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.Notification;
-import com.sun.nio.sctp.NotificationHandler;
+//import com.sun.nio.sctp.Notification;
+//import com.sun.nio.sctp.NotificationHandler;
+import client.websocket.NotificationHandler;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 
@@ -35,8 +37,10 @@ public class Repl implements NotificationHandler {
         System.out.print("\n" + prompt + " >>> ");
     }
 
+
     @Override
-    public HandlerResult handleNotification(Notification notification, Object attachment) {
-        return null;
+    public void notify(ServerMessage notification) {
+        System.out.println(notification.getServerMessageType());
+        printPrompt();
     }
 }
