@@ -1,7 +1,8 @@
 package client;
 
 import chess.ChessGame;
-import com.sun.nio.sctp.NotificationHandler;
+//import com.sun.nio.sctp.NotificationHandler;
+import client.websocket.NotificationHandler;
 import model.GameData;
 import serverfacade.ServerFacade;
 import requests.*;
@@ -63,10 +64,13 @@ public class ChessClient {
 
     public String gameEval(String[] params, String cmd) throws RuntimeException{
         return switch (cmd) {
-            case "help" -> gameHelp();
+            case "move" -> move(params);
+            case "resign" -> resign();
+            case "redraw" -> printBoard();
             case "quit" -> quit();
-            case "exit" -> exit();
-            default -> printBoard();
+            case "highlight" -> highlight();
+            case "leave" -> leave();
+            default -> gameHelp();
         };
     }
 
@@ -75,7 +79,7 @@ public class ChessClient {
                 register <username> <password> <email> - to register
                 login <username> <password> - to login
                 quit - stop client
-                help - all commands""";}
+                help - All commands""";}
 
     public String postHelp() {
         return """
@@ -85,13 +89,17 @@ public class ChessClient {
                 observe <ID> - observe game
                 logout - logout of server
                 quit - stop client
-                help - all commands""";}
+                help - All commands""";}
 
     public String gameHelp() {
         return """
-                future work
-                quit - stop client
-                help - all commands""";}
+                redraw - Redraws board
+                leave - Leaves game
+                move <ADD> - Makes a piece move
+                resign - If your losing too bad
+                highlight - Highlight Legal Moves
+                quit - Stop client
+                help - All commands""";}
 
     public String register(String... params) throws RuntimeException {
         if (params.length < 3) {
@@ -216,9 +224,22 @@ public class ChessClient {
         return "";
     }
 
-    public String exit() {
+    public String leave() {
         state = State.PostloginClient;
         return "";
+    }
+
+    public String resign() {
+        state = State.PostloginClient;
+        return "Not Finished";
+    }
+
+    public String highlight() {
+        return "Not Finished";
+    }
+
+    public String move(String... params) {
+        return "Not Finished";
     }
 
 }
