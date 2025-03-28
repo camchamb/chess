@@ -1,6 +1,7 @@
 package chess;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,8 +18,7 @@ public class ResponseException extends Exception {
 
     public static ResponseException fromJson(InputStream stream) {
         var map = new Gson().fromJson(new InputStreamReader(stream), HashMap.class);
-        var status = ((Double)map.get("status")).intValue();
         String message = map.get("message").toString();
-        return new ResponseException(status, message);
+        return new ResponseException(400, message);
     }
 }
