@@ -39,8 +39,9 @@ public class PrintBoard {
 
             setBlack(out);
 
-            String[] headers = { " h ", "  g ", "  f ", " e ", "  d ", " c ", "  b " , " a "};
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+//            String[] headers = { " h ", "  g ", "  f ", " e ", "  d ", " c ", "  b " , " a "};
+            String[] headers = {EMPTY, " h ", " g ", " f ", " e ", " d ", " c ", " b " , " a "};
+            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES + 1; ++boardCol) {
                 drawHeader(out, headers[boardCol]);
             }
 
@@ -49,8 +50,9 @@ public class PrintBoard {
 
     private static void drawWhiteHeader(PrintStream out) {
         setBlack(out);
-        String[] headers = { " a ", "  b ", "  c ", " d ", "  e ", " f ", "  g " , " h "};
-        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
+//        String[] headers = { " a ", "  b ", "  c ", " d ", "  e ", " f ", "  g " , " h "};
+        String[] headers = {EMPTY, " a ", " b ", " c ", " d ", " e ", " f ", " g " , " h "};
+        for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES + 1; ++boardCol) {
             drawHeader(out, headers[boardCol]);
         }
 
@@ -63,7 +65,7 @@ public class PrintBoard {
 
         private static void printHeaderText(PrintStream out, String player) {
             out.print(SET_BG_COLOR_BLACK);
-            out.print(SET_TEXT_COLOR_GREEN);
+            out.print(SET_TEXT_COLOR_WHITE);
 
             out.print(player);
 
@@ -73,26 +75,35 @@ public class PrintBoard {
     private static void drawWhiteBoard(PrintStream out) {
         drawWhiteHeader(out);
 
-        String[] rows = { " 1", " 2", " 3", " 4", " 5", " 6", " 7" , " 8"};
-
         for (int boardRow = 8; boardRow > 0; --boardRow) {
+            drawRowLabel(out, boardRow);
             for (int boardCol = 1; boardCol <= 8; ++boardCol) {
                 drawBoard(out, boardRow, boardCol);
             }
             drawRowLabel(out, boardRow);
+            setBlack(out);
+            out.println();
         }
+
+        drawWhiteHeader(out);
     }
 
     private static void drawBlackBoard(PrintStream out) {
         drawBlackHeader(out);
 
         for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
+
+            drawRowLabel(out, boardRow);
             for (int boardCol = 8; boardCol > 0; --boardCol) {
 
                 drawBoard(out, boardRow, boardCol);
             }
             drawRowLabel(out, boardRow);
+            setBlack(out);
+            out.println();
         }
+
+        drawBlackHeader(out);
     }
 
     private static void drawBoard(PrintStream out, int boardRow, int boardCol) {
@@ -104,21 +115,18 @@ public class PrintBoard {
     }
 
     private static void drawRowLabel(PrintStream out, int boardRow) {
-        String[] rows = { " 1", " 2", " 3", " 4", " 5", " 6", " 7" , " 8"};
+        String[] rows = { " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 " , " 8 "};
 
         out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_GREEN);
+        out.print(SET_TEXT_COLOR_WHITE);
 
         out.print(rows[boardRow - 1]);
-
-        setBlack(out);
-        out.println();
     }
 
 
     private static void setWhite(PrintStream out) {
         out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(SET_TEXT_COLOR_LIGHT_GREY);
     }
 
     private static void setBlack(PrintStream out) {
