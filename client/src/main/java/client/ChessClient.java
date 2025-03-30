@@ -181,6 +181,8 @@ public class ChessClient {
         var color = params[1].toUpperCase();
         int realGameId = gameList.get(gameID - 1).gameID();
         server.join(new JoinGameRequest(color, realGameId, authToken));
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.connect(authToken, gameID);
         state = State.GamePlayClient;
         if (color.equals("WHITE")) {
             playersColor = ChessGame.TeamColor.WHITE;
@@ -204,7 +206,8 @@ public class ChessClient {
             throw new RuntimeException("GameID not valid");
         }
         GameData obsGame = gameList.get(gameID - 1);
-
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.connect(authToken, gameID);
         state = State.GamePlayClient;
         playersColor = ChessGame.TeamColor.WHITE;
         return printBoard();
