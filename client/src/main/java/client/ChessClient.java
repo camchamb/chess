@@ -2,7 +2,9 @@ package client;
 
 import chess.ChessGame;
 //import com.sun.nio.sctp.NotificationHandler;
-import chess.ResponseException;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import model.GameData;
@@ -19,8 +21,10 @@ public class ChessClient {
     private ArrayList<GameData> gameList = null;
     private final ServerFacade server;
     private final String serverUrl;
-    private State state = State.PreloginClient;
+    public State state = State.PreloginClient;
     private ChessGame.TeamColor playersColor = null;
+    public ChessGame game;
+    private int currentGameId = -1;
     private WebSocketFacade ws;
 
     public ChessClient(String serverUrl, NotificationHandler notificationHandler) {
@@ -69,7 +73,7 @@ public class ChessClient {
         return switch (cmd) {
             case "move" -> move(params);
             case "resign" -> resign();
-            case "redraw" -> printBoard();
+            case "redraw" -> redraw();
             case "quit" -> quit();
             case "highlight" -> highlight();
             case "leave" -> leave();
@@ -98,7 +102,7 @@ public class ChessClient {
         return """
                 redraw - Redraws board
                 leave - Leaves game
-                move <ADD> - Makes a piece move
+                move <Position> <Position> <Promotion Piece>- Moves a piece from first position to second
                 resign - If your losing too bad
                 highlight - Highlight Legal Moves
                 quit - Stop client
@@ -182,14 +186,15 @@ public class ChessClient {
         int realGameId = gameList.get(gameID - 1).gameID();
         server.join(new JoinGameRequest(color, realGameId, authToken));
         ws = new WebSocketFacade(serverUrl, notificationHandler);
-        ws.connect(authToken, gameID);
+        ws.connect(authToken, realGameId);
+        currentGameId = realGameId;
         state = State.GamePlayClient;
         if (color.equals("WHITE")) {
             playersColor = ChessGame.TeamColor.WHITE;
         } else {
             playersColor = ChessGame.TeamColor.BLACK;
         }
-        return printBoard();
+        return "";
     }
 
     public String observe(String... params) throws RuntimeException {
@@ -207,10 +212,11 @@ public class ChessClient {
         }
         GameData obsGame = gameList.get(gameID - 1);
         ws = new WebSocketFacade(serverUrl, notificationHandler);
-        ws.connect(authToken, gameID);
+        ws.connect(authToken, obsGame.gameID());
+        currentGameId = obsGame.gameID();
         state = State.GamePlayClient;
         playersColor = ChessGame.TeamColor.WHITE;
-        return printBoard();
+        return "";
     }
 
     public String printPrompt() {
@@ -221,11 +227,11 @@ public class ChessClient {
         };
     }
 
-    public String printBoard() {
+    public String redraw() {
         if (playersColor.equals(ChessGame.TeamColor.WHITE)) {
-            PrintBoard.printBoard(ChessGame.TeamColor.WHITE);
+            PrintBoard.printBoard(ChessGame.TeamColor.WHITE, game);
         } else {
-            PrintBoard.printBoard(ChessGame.TeamColor.BLACK);
+            PrintBoard.printBoard(ChessGame.TeamColor.BLACK, game);
         }
         return "";
     }
@@ -236,8 +242,9 @@ public class ChessClient {
     }
 
     public String resign() {
+        ws.resign(authToken, currentGameId);
         state = State.PostloginClient;
-        return "Not Finished";
+        return "";
     }
 
     public String highlight() {
@@ -245,14 +252,51 @@ public class ChessClient {
     }
 
     public String move(String... params) {
-        return "Not Finished";
+        ChessPiece.PieceType promotionPiece;
+        if (params.length < 2) {
+            throw new RuntimeException("Expected: <Position> <Position>");
+        }
+        if (params.length == 2) {
+            promotionPiece = null;
+        } else {
+            promotionPiece = toChessPiece(params[2]);
+        }
+        if (!Character.isDigit(params[0].charAt(1)) || !Character.isDigit(params[1].charAt(1))) {
+            throw new RuntimeException("Expected: <LetterNumber> for position");
+        }
+        if (Character.isDigit(params[0].charAt(0)) || Character.isDigit(params[1].charAt(0))) {
+            throw new RuntimeException("Expected: <LetterNumber> for position");
+        }
+        var startPostition = new ChessPosition(Integer.parseInt(params[0].replaceAll("[\\D]", "")), letterToNum(params[0].charAt(0)));
+        var endPostition = new ChessPosition(Integer.parseInt(params[1].replaceAll("[\\D]", "")), letterToNum(params[1].charAt(0)));
+        ChessMove move = new ChessMove(startPostition, endPostition, promotionPiece);
+        ws.makeMove(authToken, currentGameId, move);
+        return "";
     }
 
-    private void newWebSocket() {
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
+
+    private ChessPiece.PieceType toChessPiece(String piece) {
+        return switch (piece) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            default -> throw new RuntimeException("Not a valid promotion piece");
+        };
     }
 
-
-
+    private int letterToNum(Character c) {
+        return switch (c) {
+            case 'a' -> 1;
+            case 'b' -> 2;
+            case 'c' -> 3;
+            case 'd' -> 4;
+            case 'e' -> 5;
+            case 'f' -> 6;
+            case 'g' -> 7;
+            case 'h' -> 8;
+            default -> throw new RuntimeException("Expected: <LetterNumber> for position");
+        };
+    }
 
 }
