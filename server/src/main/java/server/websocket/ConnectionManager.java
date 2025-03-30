@@ -40,4 +40,22 @@ public class ConnectionManager {
             connections.remove(c.authToken);
         }
     }
+
+    public void messageRoot(String authToken, ServerMessage notification) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : connections.values()) {
+//            if (c.session.isOpen()) {
+                if (c.authToken.equals(authToken)) {
+                    c.send(serializer.toJson(notification));
+                }
+//            } else {
+//                removeList.add(c);
+//            }
+        }
+
+        // Clean up any connections that were left open.
+//        for (var c : removeList) {
+//            connections.remove(c.authToken);
+//        }
+    }
 }
