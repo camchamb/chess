@@ -22,28 +22,27 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
-//        switch (action.getCommandType()) {
-//            case CONNECT -> enter(action.visitorName(), session);
-//            case MAKE_MOVE -> exit(action.visitorName());
-//            case LEAVE -> enter(action.visitorName(), session);
-//            case RESIGN -> exit(action.visitorName());
-//            default -> ;
-//        }
+        switch (action.getCommandType()) {
+            case CONNECT -> connect(action.getAuthToken(), action.getGameID(), session);
+//            case MAKE_MOVE -> make_move(action.visitorName());
+//            case LEAVE -> leave(action.visitorName(), session);
+//            case RESIGN -> resign(action.visitorName());
+        }
     }
 
-//    private void enter(String visitorName, Session session) throws IOException {
-//        connections.add(visitorName, session);
-//        var message = String.format("%s is in the shop", visitorName);
-//        var notification = new ServerMessage(ServerMessage.Type.ARRIVAL, message);
-//        connections.broadcast(visitorName, notification);
-//    }
-//
-//    private void exit(String visitorName) throws IOException {
-//        connections.remove(visitorName);
-//        var message = String.format("%s left the shop", visitorName);
-//        var notification = new ServerMessage(ServerMessage.Type.DEPARTURE, message);
-//        connections.broadcast(visitorName, notification);
-//    }
+    private void connect(String authToken, int gameID, Session session) throws IOException {
+        connections.add(authToken, gameID, session);
+        var message = String.format("%s is in the shop", authToken);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(authToken, gameID, notification);
+    }
+
+    private void leave(String authToken, int gameID) throws IOException {
+        connections.remove(authToken);
+        var message = String.format("%s left the shop", authToken);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(authToken, gameID, notification);
+    }
 //
 //    public void makeNoise(String petName, String sound) throws ResponseException {
 //        try {
