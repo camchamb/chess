@@ -41,21 +41,7 @@ public class ConnectionManager {
         }
     }
 
-    public void messageRoot(String authToken, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-//            if (c.session.isOpen()) {
-                if (c.authToken.equals(authToken)) {
-                    c.send(serializer.toJson(notification));
-                }
-//            } else {
-//                removeList.add(c);
-//            }
-        }
-
-        // Clean up any connections that were left open.
-//        for (var c : removeList) {
-//            connections.remove(c.authToken);
-//        }
+    public void messageRoot(Session session, ServerMessage msg) throws IOException {
+        session.getRemote().sendString(serializer.toJson(msg));
     }
 }
