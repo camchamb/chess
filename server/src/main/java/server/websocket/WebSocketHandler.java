@@ -2,6 +2,8 @@ package server.websocket;
 
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.*;
 //import exception.ResponseException;
@@ -11,6 +13,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessages;
@@ -41,9 +44,11 @@ public class WebSocketHandler {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(action.getAuthToken(), action.getGameID(), session);
-//            case MAKE_MOVE -> make_move(action.visitorName());
-            case LEAVE -> leave(action.getAuthToken(), action.getGameID());
+            case MAKE_MOVE -> make_move(new Gson().fromJson(message, MakeMoveCommand.class), session);
+            case LEAVE -> leave(action.getAuthToken(), action.getGameID(), session);
 //            case RESIGN -> resign(action.visitorName());
+            default -> connections.messageRoot(session,
+                    new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Command"));
         }
     }
 
@@ -55,28 +60,28 @@ public class WebSocketHandler {
             var authData = authAccess.getAuth(authToken);
             if (authData == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
-                connections.messageRoot(authToken, error);
+                connections.messageRoot(session, error);
                 return;
             }
             message = String.format("%s connected to the game", authData.username());
             gameData = gameAccess.getGame(gameID);
             if (gameData == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "No Such Game");
-                connections.messageRoot(authToken, error);
+                connections.messageRoot(session, error);
                 return;
             }
         } catch (DataAccessException e) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
-            connections.messageRoot(authToken, error);
+            connections.messageRoot(session, error);
             return;
         }
         var loadGame = new LoadGameMessages(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
-        connections.messageRoot(authToken, loadGame);
+        connections.messageRoot(session, loadGame);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(authToken, gameID, notification);
     }
 
-    private void leave(String authToken, int gameID) throws IOException {
+    private void leave(String authToken, int gameID, Session session) throws IOException {
         connections.remove(authToken);
         String message;
         GameData gameData;
@@ -87,7 +92,7 @@ public class WebSocketHandler {
             gameData = gameAccess.getGame(gameID);
             if (gameData == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "No Such Game");
-                connections.messageRoot(authToken, error);
+                connections.messageRoot(session, error);
                 return;
             }
             if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(authData.username())) {
@@ -98,12 +103,66 @@ public class WebSocketHandler {
             }
         } catch (DataAccessException e) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
-            connections.messageRoot(authToken, error);
+            connections.messageRoot(session, error);
             return;
         }
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(authToken, gameID, notification);
     }
+
+    private void make_move(MakeMoveCommand moveCommand, Session session) throws IOException {
+        ChessMove move = moveCommand.getMove();
+        String message;
+        String username;
+        GameData gameData;
+        ChessGame.TeamColor color = null;
+        ChessGame game;
+        try {
+            var authData = authAccess.getAuth(moveCommand.getAuthToken());
+            if (authData == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
+                connections.messageRoot(session, error);
+                return;
+            }
+            gameData = gameAccess.getGame(moveCommand.getGameID());
+            if (gameData == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "No Such Game");
+                connections.messageRoot(session, error);
+                return;
+            }
+            username = authData.username();
+            game = gameData.game();
+            if (username.equals(gameData.whiteUsername())) {
+                color = ChessGame.TeamColor.WHITE;
+            } if (username.equals(gameData.blackUsername())) {
+                color = ChessGame.TeamColor.BLACK;
+            }
+        } catch (DataAccessException e) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
+            connections.messageRoot(session, error);
+            return;
+        }
+        try {
+            if (!game.getTeamTurn().equals(color)) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Can't Make a Move");
+                connections.messageRoot(session, error);
+                return;
+            }
+            game.makeMove(move);
+            gameAccess.updateGame(gameData);
+            message = String.format("%s moved %s", username, move);
+        } catch (InvalidMoveException | DataAccessException e) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Move");
+            connections.messageRoot(session, error);
+            return;
+        }
+        var loadGame = new LoadGameMessages(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+        connections.messageRoot(session, loadGame);
+        connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), loadGame);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), notification);
+    }
+
 //
 //    public void makeNoise(String petName, String sound) throws ResponseException {
 //        try {
