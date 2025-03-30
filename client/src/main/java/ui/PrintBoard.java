@@ -17,12 +17,14 @@ public class PrintBoard {
 
         private static ChessBoard board;
 
-        public static void printBoard(ChessGame.TeamColor color) {
+        public static void printBoard(ChessGame.TeamColor color, ChessGame game) {
             var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
-            board = new ChessGame().getBoard();
+            board = game.getBoard();
 
             out.print(ERASE_SCREEN);
+
+            out.print("\n");
 
             if (color == ChessGame.TeamColor.WHITE) {
                 drawWhiteBoard(out);
