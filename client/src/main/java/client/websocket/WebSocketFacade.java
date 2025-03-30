@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import chess.ResponseException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessages;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import javax.websocket.*;
@@ -32,8 +35,16 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(notification);
+                    ServerMessage notification = serializer.fromJson(message, ServerMessage.class);
+                    if (notification.getServerMessageType().equals(ServerMessage.ServerMessageType.ERROR)) {
+                        notificationHandler.notify(serializer.fromJson(message, ErrorMessage.class));
+                    }
+                    if (notification.getServerMessageType().equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
+                        notificationHandler.notify(serializer.fromJson(message, LoadGameMessages.class));
+                    }
+                    if (notification.getServerMessageType().equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
+                        notificationHandler.notify(serializer.fromJson(message, NotificationMessage.class));
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {
