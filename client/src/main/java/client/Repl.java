@@ -4,6 +4,9 @@ import com.sun.nio.sctp.HandlerResult;
 //import com.sun.nio.sctp.Notification;
 //import com.sun.nio.sctp.NotificationHandler;
 import client.websocket.NotificationHandler;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessages;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -20,11 +23,13 @@ public class Repl implements NotificationHandler {
         var result = "";
         System.out.print("Welcome to the Chess Server." + "\n" + chessClient.eval("help") + "\n");
         while (!result.equals("quit")) {
-            printPrompt();
+            if (!chessClient.state.equals(State.GamePlayClient)) {
+                printPrompt();
+            }
             String line = scanner.nextLine();
             try {
                 result = chessClient.eval(line);
-                System.out.println("\n" + result);
+                System.out.println(result);
             } catch (Throwable e) {
                 var msg = e.getMessage();
                 System.out.print(msg);
@@ -40,7 +45,20 @@ public class Repl implements NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        System.out.println(notification.getServerMessageType());
+        ServerMessage.ServerMessageType type = notification.getServerMessageType();
+        if (type.equals(ServerMessage.ServerMessageType.NOTIFICATION)) {
+            NotificationMessage msg = (NotificationMessage) notification;
+            System.out.print(msg.getMessage());
+        }
+        if (type.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
+            LoadGameMessages msg = (LoadGameMessages) notification;
+            chessClient.game = msg.getGame();
+            chessClient.redraw();
+        }
+        if (type.equals(ServerMessage.ServerMessageType.ERROR)) {
+            ErrorMessage msg = (ErrorMessage) notification;
+            System.out.println("Error: " + msg.getErrorMessage());
+        }
         printPrompt();
     }
 }
