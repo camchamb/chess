@@ -18,6 +18,7 @@ public class ChessGame {
     private boolean blackCanCastleRight = true;
     private boolean whiteCanCastleLeft = true;
     private boolean blackCanCastleLeft = true;
+    public boolean gameOver = false;
 
     public ChessGame() {
         board.resetBoard();
@@ -83,6 +84,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (gameOver) {
+            throw new InvalidMoveException("Game is finished");
+        }
         var moves = validMoves(move.getStartPosition());
         if (moves == null || moves.isEmpty()) {
             throw new InvalidMoveException("Not a piece there");
