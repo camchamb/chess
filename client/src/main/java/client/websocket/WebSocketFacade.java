@@ -15,7 +15,7 @@ public class WebSocketFacade extends Endpoint {
 
     Session session;
     NotificationHandler notificationHandler;
-
+    private final Gson serializer = new Gson();
 
     public WebSocketFacade(String url, NotificationHandler notificationHandler) {
         try {
@@ -44,14 +44,14 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-//    public void enterPetShop(String visitorName) throws ResponseException {
-//        try {
-//            var action = new UserGameCommand(Action.Type.ENTER, visitorName);
-//            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-//        } catch (IOException ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
+    public void connect(String authToken, int gameID) {
+        try {
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID);
+            this.session.getBasicRemote().sendText(serializer.toJson(action));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex.getMessage());
+        }
+    }
 //
 //    public void leavePetShop(String visitorName) throws ResponseException {
 //        try {
