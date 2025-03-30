@@ -9,6 +9,7 @@ import java.util.Objects;
  * methods.
  */
 public class ServerMessage {
+    String message;
     ServerMessageType serverMessageType;
 
     public enum ServerMessageType {
@@ -17,8 +18,9 @@ public class ServerMessage {
         NOTIFICATION
     }
 
-    public ServerMessage(ServerMessageType type) {
+    public ServerMessage(ServerMessageType type, String message) {
         this.serverMessageType = type;
+        this.message = message;
     }
 
     public ServerMessageType getServerMessageType() {
