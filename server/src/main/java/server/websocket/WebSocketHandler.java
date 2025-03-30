@@ -46,7 +46,7 @@ public class WebSocketHandler {
             case CONNECT -> connect(action.getAuthToken(), action.getGameID(), session);
             case MAKE_MOVE -> make_move(new Gson().fromJson(message, MakeMoveCommand.class), session);
             case LEAVE -> leave(action.getAuthToken(), action.getGameID(), session);
-//            case RESIGN -> resign(action.visitorName());
+            case RESIGN -> resign(action.getAuthToken(), action.getGameID(), session);
             default -> connections.messageRoot(session,
                     new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Command"));
         }
@@ -163,14 +163,38 @@ public class WebSocketHandler {
         connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), notification);
     }
 
-//
-//    public void makeNoise(String petName, String sound) throws ResponseException {
-//        try {
-//            var message = String.format("%s says %s", petName, sound);
-//            var notification = new ServerMessage(ServerMessage.Type.NOISE, message);
-//            connections.broadcast("", notification);
-//        } catch (Exception ex) {
-//            throw new ResponseException(500, ex.getMessage());
-//        }
-//    }
+    private void resign(String authToken, int gameID, Session session) throws IOException {
+        String message;
+        GameData gameData;
+        AuthData authData;
+        try {
+            authData = authAccess.getAuth(authToken);
+            message = String.format("%s resigned the game", authData.username());
+            gameData = gameAccess.getGame(gameID);
+            if (gameData == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "No Such Game");
+                connections.messageRoot(session, error);
+                return;
+            }
+            if (gameData.game().gameOver) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game already over");
+                connections.messageRoot(session, error);
+                return;
+            }
+            if (!authData.username().equals(gameData.whiteUsername()) && !authData.username().equals(gameData.blackUsername())) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Can't resign");
+                connections.messageRoot(session, error);
+                return;
+            }
+            gameData.game().gameOver = true;
+            gameAccess.updateGame(gameData);
+        } catch (DataAccessException e) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
+            connections.messageRoot(session, error);
+            return;
+        }
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+        connections.broadcast(authToken, gameID, notification);
+        connections.messageRoot(session, notification);
+    }
 }
