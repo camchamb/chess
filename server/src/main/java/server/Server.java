@@ -2,6 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.requests.*;
 import service.UserService;
@@ -23,6 +24,10 @@ public class Server {
 
         UserService userService = new UserService(userAccess, authAccess);
         GameService gameService = new GameService(gameAccess, authAccess);
+
+        WebSocketHandler webSocketHandler = new WebSocketHandler();
+
+        Spark.webSocket("/ws", webSocketHandler);
 
         var serializer = new Gson();
 
