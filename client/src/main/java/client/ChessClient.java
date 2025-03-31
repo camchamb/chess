@@ -14,6 +14,8 @@ import model.UserData;
 import ui.PrintBoard;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Scanner;
 
 public class ChessClient {
     private final NotificationHandler notificationHandler;
@@ -73,9 +75,9 @@ public class ChessClient {
         return switch (cmd) {
             case "move" -> move(params);
             case "resign" -> resign();
-            case "redraw" -> redraw();
+            case "redraw" -> redraw(new ArrayList<ChessMove>());
             case "quit" -> quit();
-            case "highlight" -> highlight();
+            case "highlight" -> highlight(params);
             case "leave" -> leave();
             default -> gameHelp();
         };
@@ -160,10 +162,14 @@ public class ChessClient {
     public String logout() throws RuntimeException {
         server.logout(new LogoutRequest(authToken));
         state = State.PreloginClient;
+        authToken = null;
         return "Logged out";
     }
 
     public String quit() throws RuntimeException {
+        if (state.equals(State.GamePlayClient)) {
+            ws.leave(authToken, currentGameId);
+        }
         server.logout(new LogoutRequest(authToken));
         state = State.PreloginClient;
         return "quit";
@@ -227,32 +233,53 @@ public class ChessClient {
         };
     }
 
-    public String redraw() {
+    public String redraw(Collection<ChessMove> chessMoves) {
         if (playersColor.equals(ChessGame.TeamColor.WHITE)) {
-            PrintBoard.printBoard(ChessGame.TeamColor.WHITE, game);
+            PrintBoard.printBoard(ChessGame.TeamColor.WHITE, game, chessMoves);
         } else {
-            PrintBoard.printBoard(ChessGame.TeamColor.BLACK, game);
+            PrintBoard.printBoard(ChessGame.TeamColor.BLACK, game, chessMoves);
         }
         return "";
     }
 
     public String leave() {
+        ws.leave(authToken, currentGameId);
         state = State.PostloginClient;
+        currentGameId = -1;
         return "";
     }
 
     public String resign() {
-        ws.resign(authToken, currentGameId);
-        state = State.PostloginClient;
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Are you sure?");
+        String line = scanner.nextLine();
+        if (line.toLowerCase().contains("yes") || line.toLowerCase().contains("y")) {
+            ws.resign(authToken, currentGameId);
+            return "";
+        }
         return "";
     }
 
-    public String highlight() {
-        return "Not Finished";
+    public String highlight(String... params) {
+        if (params.length < 1) {
+            throw new RuntimeException("Expected: <Position>");
+        }
+        if (params[0].length() != 2) {
+            throw new RuntimeException("Expected: <LetterNumber> for position");
+        }
+        if (!Character.isDigit(params[0].charAt(1)) || Character.isDigit(params[0].charAt(0))) {
+            throw new RuntimeException("Expected: <LetterNumber> for position");
+        }
+        var startPostition = new ChessPosition(Integer.parseInt(params[0].replaceAll("[\\D]", "")), letterToNum(params[0].charAt(0)));
+        redraw(game.validMoves(startPostition));
+        return "";
     }
 
     public String move(String... params) {
         ChessPiece.PieceType promotionPiece;
+        if (!game.getTeamTurn().equals(playersColor)) {
+            throw new RuntimeException("Error: Not your turn");
+        }
         if (params.length < 2) {
             throw new RuntimeException("Expected: <Position> <Position>");
         }
@@ -260,6 +287,9 @@ public class ChessClient {
             promotionPiece = null;
         } else {
             promotionPiece = toChessPiece(params[2]);
+        }
+        if (params[0].length() != 2 || params[1].length() != 2) {
+            throw new RuntimeException("Expected: <LetterNumber> for position");
         }
         if (!Character.isDigit(params[0].charAt(1)) || !Character.isDigit(params[1].charAt(1))) {
             throw new RuntimeException("Expected: <LetterNumber> for position");
