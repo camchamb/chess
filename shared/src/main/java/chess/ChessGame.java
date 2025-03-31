@@ -88,7 +88,10 @@ public class ChessGame {
             throw new InvalidMoveException("Game is finished");
         }
         var moves = validMoves(move.getStartPosition());
-        if (moves == null || moves.isEmpty()) {
+        if (moves == null) {
+            throw new InvalidMoveException("In check");
+        }
+        if (moves.isEmpty()) {
             throw new InvalidMoveException("Not a piece there");
         }
         if (board.getPiece(move.getStartPosition()).getTeamColor() != currentPlayer) {
@@ -235,7 +238,11 @@ public class ChessGame {
         if (!isInCheck(teamColor)) {
             return false;
         }
-        return noMoves(board, teamColor);
+        if (noMoves(board, teamColor)) {
+            gameOver = true;
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -249,7 +256,11 @@ public class ChessGame {
         if (isInCheck(teamColor)) {
             return false;
         }
-        return noMoves(board, teamColor);
+        if (noMoves(board, teamColor)) {
+            gameOver = true;
+            return true;
+        }
+        return false;
     }
 
     /**
