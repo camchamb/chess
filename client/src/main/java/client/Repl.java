@@ -1,14 +1,16 @@
 package client;
 
-import com.sun.nio.sctp.HandlerResult;
 //import com.sun.nio.sctp.Notification;
 //import com.sun.nio.sctp.NotificationHandler;
+import chess.ChessMove;
+import chess.ChessPosition;
 import client.websocket.NotificationHandler;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessages;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Repl implements NotificationHandler {
@@ -23,9 +25,7 @@ public class Repl implements NotificationHandler {
         var result = "";
         System.out.print("Welcome to the Chess Server." + "\n" + chessClient.eval("help") + "\n");
         while (!result.equals("quit")) {
-            if (!chessClient.state.equals(State.GamePlayClient)) {
-                printPrompt();
-            }
+            printPrompt();
             String line = scanner.nextLine();
             try {
                 result = chessClient.eval(line);
@@ -53,7 +53,7 @@ public class Repl implements NotificationHandler {
         if (type.equals(ServerMessage.ServerMessageType.LOAD_GAME)) {
             LoadGameMessages msg = (LoadGameMessages) notification;
             chessClient.game = msg.getGame();
-            chessClient.redraw();
+            chessClient.redraw(new ArrayList<ChessMove>());
         }
         if (type.equals(ServerMessage.ServerMessageType.ERROR)) {
             ErrorMessage msg = (ErrorMessage) notification;
