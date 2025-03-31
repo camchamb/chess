@@ -12,7 +12,6 @@ import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
@@ -44,7 +43,7 @@ public class WebSocketHandler {
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
         switch (action.getCommandType()) {
             case CONNECT -> connect(action.getAuthToken(), action.getGameID(), session);
-            case MAKE_MOVE -> make_move(new Gson().fromJson(message, MakeMoveCommand.class), session);
+            case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMoveCommand.class), session);
             case LEAVE -> leave(action.getAuthToken(), action.getGameID(), session);
             case RESIGN -> resign(action.getAuthToken(), action.getGameID(), session);
             default -> connections.messageRoot(session,
@@ -116,7 +115,7 @@ public class WebSocketHandler {
         connections.broadcast(authToken, gameID, notification);
     }
 
-    private void make_move(MakeMoveCommand moveCommand, Session session) throws IOException {
+    private void makeMove(MakeMoveCommand moveCommand, Session session) throws IOException {
         ChessMove move = moveCommand.getMove();
         String message;
         String username;
