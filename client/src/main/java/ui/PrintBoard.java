@@ -1,12 +1,13 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ui.EscapeSequences.*;
 
@@ -17,8 +18,20 @@ public class PrintBoard {
 
         private static ChessBoard board;
 
-        public static void printBoard(ChessGame.TeamColor color, ChessGame game) {
+        private static Set<ChessPosition> endPositions;
+        private static ChessPosition startPosition;
+
+        public static void printBoard(ChessGame.TeamColor color, ChessGame game, Collection<ChessMove> chessMoves) {
             var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+            startPosition = null;
+            endPositions = new HashSet<>();
+
+           if (!chessMoves.isEmpty()) {
+               startPosition = chessMoves.iterator().next().getStartPosition();
+           }
+            for (var move : chessMoves) {
+                endPositions.add(move.getEndPosition());
+            }
 
             board = game.getBoard();
 
@@ -109,10 +122,23 @@ public class PrintBoard {
     }
 
     private static void drawBoard(PrintStream out, int boardRow, int boardCol) {
+        var position = new ChessPosition(boardRow, boardCol);
         if ((boardRow + boardCol) % 2 != 0) {
-            printWhiteSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
+            if (endPositions.contains(position)) {
+                printLightGreenSquare(out, board.getPiece(position));
+            } else if (startPosition != null && startPosition.equals(position)) {
+                printYellowSquare(out, board.getPiece(position));
+            } else {
+                printWhiteSquare(out, board.getPiece(position));
+            }
         } else {
-            printBlackSquare(out, board.getPiece(new ChessPosition(boardRow, boardCol)));
+            if (endPositions.contains(position)) {
+                printDarkGreenSquare(out, board.getPiece(position));
+            } else if (startPosition != null && startPosition.equals(position)) {
+                printOrangeSquare(out, board.getPiece(position));
+            } else {
+                printBlackSquare(out, board.getPiece(position));
+            }
         }
     }
 
@@ -147,6 +173,38 @@ public class PrintBoard {
 
     private static void printBlackSquare(PrintStream out, ChessPiece player) {
         out.print(SET_BG_COLOR_LIGHT_GREY);
+        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(toCharacter(player));
+
+        setWhite(out);
+    }
+
+    private static void printLightGreenSquare(PrintStream out, ChessPiece player) {
+        out.print(SET_BG_COLOR_GREEN);
+        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(toCharacter(player));
+
+        setWhite(out);
+    }
+
+    private static void printDarkGreenSquare(PrintStream out, ChessPiece player) {
+        out.print(SET_BG_COLOR_DARK_GREEN);
+        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(toCharacter(player));
+
+        setWhite(out);
+    }
+
+    private static void printYellowSquare(PrintStream out, ChessPiece player) {
+        out.print(SET_BG_COLOR_YELLOW);
+        out.print(SET_TEXT_COLOR_BLACK);
+        out.print(toCharacter(player));
+
+        setWhite(out);
+    }
+
+    private static void printOrangeSquare(PrintStream out, ChessPiece player) {
+        out.print(SET_BG_COLOR_MAGENTA);
         out.print(SET_TEXT_COLOR_BLACK);
         out.print(toCharacter(player));
 
