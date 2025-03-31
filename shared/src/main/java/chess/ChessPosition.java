@@ -15,7 +15,17 @@ public class ChessPosition {
 
     @Override
     public String toString() {
-        return "{" + row + ", " + col + '}';
+        return switch (col) {
+            case 1 -> "a" + row;
+            case 2 -> "b" + row;
+            case 3 -> "c" + row;
+            case 4 -> "d" + row;
+            case 5 -> "e" + row;
+            case 6 -> "f" + row;
+            case 7 -> "g" + row;
+            case 8 -> "h" + row;
+            default -> col + ", " + row;
+        };
     }
 
     @Override
