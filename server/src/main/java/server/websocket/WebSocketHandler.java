@@ -63,12 +63,18 @@ public class WebSocketHandler {
                 connections.messageRoot(session, error);
                 return;
             }
-            message = String.format("%s connected to the game", authData.username());
             gameData = gameAccess.getGame(gameID);
             if (gameData == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "No Such Game");
                 connections.messageRoot(session, error);
                 return;
+            }
+            if (authData.username().equals(gameData.whiteUsername())) {
+                message = String.format("%s connected as White Player", authData.username());
+            } else if (authData.username().equals(gameData.blackUsername())) {
+                message = String.format("%s connected as Black Player", authData.username());
+            } else {
+                message = String.format("%s connected as an observer", authData.username());
             }
         } catch (DataAccessException e) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
@@ -150,18 +156,51 @@ public class WebSocketHandler {
             }
             game.makeMove(move);
             gameAccess.updateGame(gameData);
-            message = String.format("%s moved %s", username, move);
-        } catch (InvalidMoveException | DataAccessException e) {
+            message = String.format("%s moved %s to %s", username, move.getStartPosition(), move.getEndPosition());
+            var loadGame = new LoadGameMessages(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+            connections.messageRoot(session, loadGame);
+            connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), loadGame);
+            String checkMessage = checkMessages(game, gameData);
+            if (checkMessage != null) {
+                NotificationMessage notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, checkMessage);
+                connections.messageRoot(session, notification);
+                connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), notification);
+            }
+        } catch (DataAccessException e) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Invalid Move");
             connections.messageRoot(session, error);
             return;
+        } catch (InvalidMoveException e) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, e.getMessage());
+            connections.messageRoot(session, error);
+            return;
         }
-        var loadGame = new LoadGameMessages(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
-        connections.messageRoot(session, loadGame);
-        connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), loadGame);
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(moveCommand.getAuthToken(), moveCommand.getGameID(), notification);
     }
+
+    private String checkMessages(ChessGame game, GameData gameData) {
+        if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+            return "Game ends in Stalemate";
+        }
+        if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+            return "Game ends in Stalemate";
+        }
+        if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+            return String.format("%s is in checkmate", gameData.whiteUsername());
+        }
+        if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+            return String.format("%s is in checkmate", gameData.blackUsername());
+        }
+        if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+            return String.format("%s is in check", gameData.whiteUsername());
+        }
+        if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+            return String.format("%s is in check", gameData.blackUsername());
+        }
+        return null;
+    }
+
 
     private void resign(String authToken, int gameID, Session session) throws IOException {
         String message;
