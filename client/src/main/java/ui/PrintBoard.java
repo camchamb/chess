@@ -225,25 +225,22 @@ public class PrintBoard {
     }
 
     private static String whiteCharacter(ChessPiece.PieceType type) {
+        return getString(type, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_PAWN);
+    }
+
+    private static String getString(ChessPiece.PieceType type, String whiteKing, String whiteQueen, String whiteBishop, String whiteKnight, String whiteRook, String whitePawn) {
         return switch (type) {
-            case KING -> WHITE_KING;
-            case QUEEN -> WHITE_QUEEN;
-            case BISHOP -> WHITE_BISHOP;
-            case KNIGHT -> WHITE_KNIGHT;
-            case ROOK -> WHITE_ROOK;
-            case PAWN -> WHITE_PAWN;
+            case KING -> whiteKing;
+            case QUEEN -> whiteQueen;
+            case BISHOP -> whiteBishop;
+            case KNIGHT -> whiteKnight;
+            case ROOK -> whiteRook;
+            case PAWN -> whitePawn;
         };
     }
 
     private static String blackCharacter(ChessPiece.PieceType type) {
-        return switch (type) {
-            case KING -> BLACK_KING;
-            case QUEEN -> BLACK_QUEEN;
-            case BISHOP -> BLACK_BISHOP;
-            case KNIGHT -> BLACK_KNIGHT;
-            case ROOK -> BLACK_ROOK;
-            case PAWN -> BLACK_PAWN;
-        };
+        return getString(type, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK, BLACK_PAWN);
     }
 
 }
