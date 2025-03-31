@@ -228,7 +228,8 @@ public class PrintBoard {
         return getString(type, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK, WHITE_PAWN);
     }
 
-    private static String getString(ChessPiece.PieceType type, String whiteKing, String whiteQueen, String whiteBishop, String whiteKnight, String whiteRook, String whitePawn) {
+    private static String getString(ChessPiece.PieceType type, String whiteKing, String whiteQueen,
+                                    String whiteBishop, String whiteKnight, String whiteRook, String whitePawn) {
         return switch (type) {
             case KING -> whiteKing;
             case QUEEN -> whiteQueen;
