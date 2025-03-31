@@ -47,19 +47,19 @@ public class EscapeSequences {
     public static final String SET_BG_COLOR_WHITE = SET_BG_COLOR + "15m";
     public static final String RESET_BG_COLOR = UNICODE_ESCAPE + "[49m";
 
-    public static final String rWHITE_KING = " ♔ ";
-    public static final String rWHITE_QUEEN = " ♕ ";
-    public static final String rWHITE_BISHOP = " ♗ ";
-    public static final String rWHITE_KNIGHT = " ♘ ";
-    public static final String rWHITE_ROOK = " ♖ ";
-    public static final String rWHITE_PAWN = " ♙ ";
-    public static final String rBLACK_KING = " ♚ ";
-    public static final String rBLACK_QUEEN = " ♛ ";
-    public static final String rBLACK_BISHOP = " ♝ ";
-    public static final String rBLACK_KNIGHT = " ♞ ";
-    public static final String rBLACK_ROOK = " ♜ ";
-    public static final String rBLACK_PAWN = " ♟ ";
-    public static final String rEMPTY = " \u2003 ";
+    public static final String RWHITE_KING = " ♔ ";
+    public static final String RWHITE_QUEEN = " ♕ ";
+    public static final String RWHITE_BISHOP = " ♗ ";
+    public static final String RWHITE_KNIGHT = " ♘ ";
+    public static final String RWHITE_ROOK = " ♖ ";
+    public static final String RWHITE_PAWN = " ♙ ";
+    public static final String RBLACK_KING = " ♚ ";
+    public static final String RBLACK_QUEEN = " ♛ ";
+    public static final String RBLACK_BISHOP = " ♝ ";
+    public static final String RBLACK_KNIGHT = " ♞ ";
+    public static final String RBLACK_ROOK = " ♜ ";
+    public static final String RBLACK_PAWN = " ♟ ";
+    public static final String REMPTY = " \u2003 ";
 
     public static final String WHITE_KING = SET_TEXT_COLOR_BLUE + " K ";
     public static final String WHITE_QUEEN = SET_TEXT_COLOR_BLUE + " Q ";
