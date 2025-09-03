@@ -137,6 +137,11 @@ public class WebSocketHandler {
             }
             username = authData.username();
             game = gameData.game();
+            if (game.gameOver) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Game is Finished");
+                connections.messageRoot(session, error);
+                return;
+            }
             if (username.equals(gameData.whiteUsername())) {
                 color = ChessGame.TeamColor.WHITE;
             } if (username.equals(gameData.blackUsername())) {
@@ -226,6 +231,9 @@ public class WebSocketHandler {
             }
             gameData.game().gameOver = true;
             gameAccess.updateGame(gameData);
+            var loadGame = new LoadGameMessages(ServerMessage.ServerMessageType.LOAD_GAME, gameData.game());
+            connections.messageRoot(session, loadGame);
+            connections.broadcast(authToken, gameID, loadGame);
         } catch (DataAccessException e) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Bad Request");
             connections.messageRoot(session, error);

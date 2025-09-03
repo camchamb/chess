@@ -88,10 +88,7 @@ public class ChessGame {
             throw new InvalidMoveException("Game is finished");
         }
         var moves = validMoves(move.getStartPosition());
-        if (moves == null) {
-            throw new InvalidMoveException("In check");
-        }
-        if (moves.isEmpty()) {
+        if (moves == null || moves.isEmpty()) {
             throw new InvalidMoveException("Not a piece there");
         }
         if (board.getPiece(move.getStartPosition()).getTeamColor() != currentPlayer) {

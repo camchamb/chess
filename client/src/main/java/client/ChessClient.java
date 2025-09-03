@@ -277,6 +277,9 @@ public class ChessClient {
 
     public String move(String... params) {
         ChessPiece.PieceType promotionPiece;
+        if (game.gameOver) {
+            throw new RuntimeException("Error: Game is Finished");
+        }
         if (!game.getTeamTurn().equals(playersColor)) {
             throw new RuntimeException("Error: Not your turn");
         }

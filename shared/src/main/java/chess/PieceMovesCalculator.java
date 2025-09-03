@@ -19,25 +19,18 @@ public class PieceMovesCalculator {
     }
 
     public Collection<ChessMove> pieceMoves() {
-        ArrayList<ChessMove> moves = new ArrayList<>();
-        if (this.type.equals(ChessPiece.PieceType.ROOK)) {
-            moves = (ArrayList<ChessMove>) rookMove(moves);
-        }
-        if (this.type.equals(ChessPiece.PieceType.PAWN)) {
-            moves = (ArrayList<ChessMove>) pawnMove(moves);
-        }
-        if (this.type.equals(ChessPiece.PieceType.KING)) {
-            moves = (ArrayList<ChessMove>) kingMove(moves);
-        }
-        if (this.type.equals(ChessPiece.PieceType.BISHOP)) {
-            moves = (ArrayList<ChessMove>) bishopMove(moves);
-        }
-        if (this.type.equals(ChessPiece.PieceType.QUEEN)) {
-            moves = (ArrayList<ChessMove>) rookMove(moves);
-            moves = (ArrayList<ChessMove>) bishopMove(moves);
-        }
-        if (this.type.equals(ChessPiece.PieceType.KNIGHT)) {
-            moves = (ArrayList<ChessMove>) knightMove(moves);
+        List<ChessMove> moves = new ArrayList<>();
+
+        switch (this.type) {
+            case ROOK -> moves.addAll(rookMove(moves));
+            case PAWN -> moves.addAll(pawnMove(moves));
+            case KING -> moves.addAll(kingMove(moves));
+            case BISHOP -> moves.addAll(bishopMove(moves));
+            case KNIGHT -> moves.addAll(knightMove(moves));
+            case QUEEN -> {
+                moves.addAll(rookMove(moves));
+                moves.addAll(bishopMove(moves));
+            }
         }
         return moves;
     }
@@ -120,8 +113,7 @@ public class PieceMovesCalculator {
     private Collection<ChessMove> kingMove(Collection<ChessMove> moves) {
         for (int y = myPosition.getRow()-1; y <= myPosition.getRow()+1; y++) {
             for (int x = myPosition.getColumn() - 1; x <= myPosition.getColumn() + 1; x++) {
-                if (!addSpace(moves, y, x)) {
-                }
+                addSpace(moves, y, x);
             }
         }
         return moves;
