@@ -2,6 +2,8 @@ package chess;
 
 import java.util.Arrays;
 import java.util.Objects;
+import static chess.ChessPiece.PieceType.*;
+import static chess.ChessGame.TeamColor.*;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -109,35 +111,17 @@ public class ChessBoard implements Cloneable {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
+        ChessPiece.PieceType[] backRow = {ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK};
+
         board = new ChessPiece[8][8];
         whiteKing = new ChessPosition(1, 5);
         blackKing = new ChessPosition(8, 5);
 
-        for (int x = 1; x < 9; x++) {
-            var whitePiece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            var blackPiece = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            addPiece(new ChessPosition(2, x), whitePiece);
-            addPiece(new ChessPosition(7, x), blackPiece);
-        }
-        int y = 1;
-        for (ChessGame.TeamColor color : ChessGame.TeamColor.values()) {
-            var rookPiece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-            var knightPiece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-            var bishopPiece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-            var kingPiece = new ChessPiece(color, ChessPiece.PieceType.KING);
-            var queenPiece = new ChessPiece(color, ChessPiece.PieceType.QUEEN);
-            var rook2Piece = new ChessPiece(color, ChessPiece.PieceType.ROOK);
-            var knight2Piece = new ChessPiece(color, ChessPiece.PieceType.KNIGHT);
-            var bishop2Piece = new ChessPiece(color, ChessPiece.PieceType.BISHOP);
-            addPiece(new ChessPosition(y, 1), rookPiece);
-            addPiece(new ChessPosition(y, 2), knightPiece);
-            addPiece(new ChessPosition(y, 3), bishopPiece);
-            addPiece(new ChessPosition(y, 5), kingPiece);
-            addPiece(new ChessPosition(y, 4), queenPiece);
-            addPiece(new ChessPosition(y, 8), rook2Piece);
-            addPiece(new ChessPosition(y, 7), knight2Piece);
-            addPiece(new ChessPosition(y, 6), bishop2Piece);
-            y += 7;
+        for (int col = 0; col < backRow.length; col++) {
+            addPiece(new ChessPosition(1, col + 1), new ChessPiece(WHITE, backRow[col]));
+            addPiece(new ChessPosition(2, col + 1), new ChessPiece(WHITE, PAWN));
+            addPiece(new ChessPosition(8, col + 1), new ChessPiece(BLACK, backRow[col]));
+            addPiece(new ChessPosition(7, col + 1), new ChessPiece(BLACK, PAWN));
         }
     }
 

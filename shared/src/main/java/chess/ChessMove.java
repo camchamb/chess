@@ -16,11 +16,7 @@ public class ChessMove implements Cloneable {
 
     @Override
     public String toString() {
-        return "{" +
-                "start=" + startPosition +
-                ", end=" + endPosition +
-                ", promotion=" + promotionPiece +
-                '}';
+        return STR."{start=\{startPosition}, end=\{endPosition}, promotion=\{promotionPiece}}";
     }
 
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
